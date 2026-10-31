@@ -1,0 +1,9 @@
+Speaker 1: Quick one today. First, the support bot. It's answering about sixty percent of tickets now.
+Speaker 2: Agreed that we roll it out to the Spanish queue next. That's the plan for November.
+Speaker 1: Good. That's decided. Omar, you own the rollout?
+Speaker 2: Yes. I'll have it live in the Spanish queue by the fifteenth.
+Speaker 1: Second, the Salesforce sync keeps timing out at night.
+Speaker 3: I'll add retries and an alert to the sync job by Wednesday.
+Speaker 1: Thanks. Someone also needs to write the runbook for the bot, but nobody has time this week.
+Speaker 3: Open question: Do we keep paying for the old transcription tool? Finance hasn't answered.
+Speaker 1: Let's leave that for next week.

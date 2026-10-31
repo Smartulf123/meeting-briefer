@@ -45,7 +45,9 @@
     <label for="ek">ElevenLabs API key <span class="hint">(only needed for audio)</span></label>
     <input id="ek" type="password" autocomplete="off">
     <label for="tx">Transcript or notes</label>
-    <textarea id="tx" required></textarea>
+    <textarea id="tx"></textarea>
+    <label for="rec">Or upload a recording <span class="hint">(mp3, wav, m4a, webm; transcribed with ElevenLabs Scribe, needs the ElevenLabs key)</span></label>
+    <input id="rec" type="file" accept="audio/*,video/*">
     <div class="row">
       <button class="primary" id="go" type="submit">Make briefing</button>
       <button type="button" id="example">Load example</button>
@@ -75,20 +77,35 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const list = (items) => items.length ? "<ul>" + items.map((i) => `<li>${esc(i)}</li>`).join("") + "</ul>" : '<p class="none">None</p>';
 
-$("example").onclick = () => { $("tx").value = EXAMPLE; };
+$("example").onclick = () => { $("tx").value = EXAMPLE; $("rec").value = ""; };
 
 $("form").onsubmit = async (e) => {
   e.preventDefault();
   $("error").hidden = true; $("result").hidden = true;
   $("go").disabled = true; $("go").textContent = "Working...";
-  const headers = { "Content-Type": "application/json" };
+  const headers = {};
   if ($("ak").value.trim()) headers["X-Anthropic-Api-Key"] = $("ak").value.trim();
   if ($("ek").value.trim()) headers["X-ElevenLabs-Api-Key"] = $("ek").value.trim();
+  const file = $("rec").files[0];
   try {
-    const resp = await fetch("/briefings", {
-      method: "POST", headers,
-      body: JSON.stringify({ transcript: $("tx").value, audio: $("audio").checked, source: "web" }),
-    });
+    let resp;
+    if (file) {
+      // The recording goes up as the raw body with its audio/* type, not as a form.
+      $("go").textContent = "Transcribing...";
+      const query = new URLSearchParams({ audio: $("audio").checked, filename: file.name });
+      resp = await fetch("/briefings/audio?" + query, {
+        method: "POST",
+        headers: { ...headers, "Content-Type": file.type || "audio/mpeg" },
+        body: file,
+      });
+    } else {
+      if ($("tx").value.trim().length < 20) throw new Error("Paste a transcript or choose a recording.");
+      resp = await fetch("/briefings", {
+        method: "POST",
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify({ transcript: $("tx").value, audio: $("audio").checked, source: "web" }),
+      });
+    }
     const data = await resp.json();
     if (!resp.ok) throw new Error(typeof data.detail === "string" ? data.detail : JSON.stringify(data.detail));
     render(data);
@@ -111,6 +128,7 @@ function render(d) {
     <h2>Action items</h2>
     ${rows ? `<table><tr><th>Task</th><th>Owner</th><th>Due</th></tr>${rows}</table>` : '<p class="none">None</p>'}
     <h2>Open questions</h2>${list(s.open_questions)}
+    ${d.transcript ? `<details><summary>Transcript from the recording</summary><pre>${esc(d.transcript)}</pre></details>` : ""}
     <details><summary>Briefing script and raw JSON (attempts: ${d.attempts})</summary>
       <p>${esc(d.script)}</p><pre>${esc(JSON.stringify(s, null, 2))}</pre></details>`;
   $("result").hidden = false;

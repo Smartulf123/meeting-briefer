@@ -10,6 +10,7 @@ from meeting_briefer import pipeline
 from meeting_briefer.api import create_app, sign, verify_signature
 from meeting_briefer.config import get_settings
 from meeting_briefer.extract import ExtractionResult
+from meeting_briefer.stt import Transcription
 
 from .conftest import TRANSCRIPT
 
@@ -26,9 +27,48 @@ def make_client(settings, summary, seen=None):
             synthesizer=lambda text, _: b"ID3-fake-mp3",
         )
 
-    app = create_app(run=fake_run)
+    def fake_run_audio(recording, filename, s, audio=True):
+        if seen is not None:
+            seen.append(s)
+        return pipeline.run_from_audio(
+            recording,
+            filename,
+            s,
+            audio=audio,
+            transcriber=lambda r, n, _: Transcription("Speaker 1: " + TRANSCRIPT, 1, 3.0),
+            extractor=lambda t, _: ExtractionResult(summary, attempts=1),
+            synthesizer=lambda text, _: b"ID3-fake-mp3",
+        )
+
+    app = create_app(run=fake_run, run_audio=fake_run_audio)
     app.dependency_overrides[get_settings] = lambda: settings
     return TestClient(app)
+
+
+def test_recording_upload_returns_transcript_and_audio(settings, summary):
+    client = make_client(settings, summary)
+    resp = client.post(
+        "/briefings/audio?filename=standup.mp3",
+        content=b"fake-mp3-bytes",
+        headers={"Content-Type": "audio/mpeg"},
+    )
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    assert body["transcript"].startswith("Speaker 1:")
+    assert client.get(body["audio_url"]).content == b"ID3-fake-mp3"
+
+
+def test_recording_upload_rejects_forms_and_large_files(settings, summary):
+    client = make_client(settings, summary)
+    # A cross-site HTML form would send multipart/form-data, which is refused.
+    form = client.post("/briefings/audio", files={"f": ("a.mp3", b"x", "audio/mpeg")})
+    assert form.status_code == 415
+
+    small = settings.model_copy(update={"max_upload_mb": 0})
+    resp = make_client(small, summary).post(
+        "/briefings/audio", content=b"x" * 10, headers={"Content-Type": "audio/mpeg"}
+    )
+    assert resp.status_code == 413
 
 
 def test_health_and_index_page(settings, summary):

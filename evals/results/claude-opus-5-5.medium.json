@@ -3,9 +3,9 @@
   "effort": "medium",
   "cases_run": 8,
   "cases_failed": 0,
-  "input_tokens": 10749,
-  "output_tokens": 2229,
-  "seconds": 26.8,
+  "input_tokens": 11429,
+  "output_tokens": 2307,
+  "seconds": 27.4,
   "metrics": {
     "action_precision": 0.9090909090909091,
     "action_recall": 1.0,
@@ -20,10 +20,10 @@
       "attempts": 1,
       "prediction": {
         "title": "Product Sync: Pricing, Onboarding, Enterprise Plan",
-        "summary": "The team confirmed the launch date for the new pricing, discussed falling open rates on onboarding emails, and confirmed the enterprise plan change to demo-only.",
+        "summary": "The team confirmed the launch date for the new pricing, discussed falling open rates on onboarding emails, and confirmed that the enterprise plan will be demo-only. The annual discount question was deferred.",
         "decisions": [
           "New pricing goes live on March 1st.",
-          "The free trial for the enterprise plan is dropped; enterprise goes demo-only."
+          "The free trial for the enterprise plan is dropped; enterprise becomes demo-only."
         ],
         "action_items": [
           {
@@ -32,7 +32,7 @@
             "due": "Friday"
           },
           {
-            "task": "Rewrite onboarding email subject lines and run an A/B test.",
+            "task": "Rewrite the onboarding email subject lines and run an A/B test.",
             "owner": "Ahmed",
             "due": "in two weeks"
           },
@@ -43,7 +43,7 @@
           }
         ],
         "open_questions": [
-          "Should the annual discount stay at 20 percent? Finance has not answered yet, and it was left for next week."
+          "Should the annual discount stay at 20 percent? Finance has not answered yet, and this was deferred to next week."
         ]
       },
       "score": {
@@ -63,10 +63,10 @@
       "case": "02-en-sprint-planning",
       "attempts": 1,
       "prediction": {
-        "title": "Sprint Planning Week 12",
-        "summary": "The team set the sprint goal of getting single sign-on working in the test environment, assigned work on SSO and an Android notification bug, and agreed to drop iOS 15 support from the next release.",
+        "title": "Sprint Planning, Week 12",
+        "summary": "The team set the sprint goal of getting single sign-on working in the test environment, assigned the SSO integration and an Android duplicate notification bug, and agreed to drop iOS 15 support from the next release.",
         "decisions": [
-          "The sprint goal is for single sign-on to work in the test environment.",
+          "The sprint goal is that single sign-on works in the test environment.",
           "Support for iOS 15 will be dropped from the next release."
         ],
         "action_items": [
@@ -76,7 +76,7 @@
             "due": "Thursday"
           },
           {
-            "task": "Investigate the bug where notifications arrive twice on Android.",
+            "task": "Investigate the bug where notifications arrive twice on Android, possibly related to the push token.",
             "owner": "Sofie",
             "due": null
           },
@@ -87,12 +87,12 @@
           },
           {
             "task": "Discuss the profile page design with the designers.",
-            "owner": null,
+            "owner": "Ingrid",
             "due": "next week"
           }
         ],
         "open_questions": [
-          "The design for the profile page is not ready yet; to be taken up with the designers next week."
+          "The profile page design is not ready yet and still needs to be resolved with the designers."
         ]
       },
       "score": {
@@ -112,11 +112,11 @@
       "case": "03-en-task-handover",
       "attempts": 1,
       "prediction": {
-        "title": "Ops Weekly: Backup Migration and On-Call Rotation",
-        "summary": "The team reassigned the backup migration from Tom to Priya because Tom's parental leave starts next Monday. They also confirmed that the on-call rotation will change from daily to weekly starting in April.",
+        "title": "Ops Weekly: Backup Migration and On-Call Changes",
+        "summary": "The team reassigned the backup migration from Tom to Priya because Tom starts parental leave next Monday. They also confirmed that the on-call rotation will move from daily to weekly starting in April.",
         "decisions": [
-          "Priya takes over the backup migration from Tom, with a target of end of the month.",
-          "The on-call rotation moves from daily to weekly, starting in April."
+          "Priya takes over ownership of the backup migration to the new storage bucket from Tom.",
+          "The on-call rotation will change from daily to weekly, starting in April."
         ],
         "action_items": [
           {
@@ -125,12 +125,12 @@
             "due": "end of the month"
           },
           {
-            "task": "Send Priya the notes on the backup migration.",
+            "task": "Send backup migration notes to Priya.",
             "owner": "Tom",
             "due": "today"
           },
           {
-            "task": "Update the on-call schedule in PagerDuty to the weekly rotation.",
+            "task": "Update the on-call schedule in PagerDuty to a weekly rotation.",
             "owner": "Lena",
             "due": null
           }
@@ -154,8 +154,8 @@
       "case": "04-en-unowned-tasks",
       "attempts": 1,
       "prediction": {
-        "title": "Customer Feedback Review",
-        "summary": "Sam and Nina reviewed this month's customer feedback, including Excel export failures with Norwegian characters, requests for dark mode, and mobile app login crashes.",
+        "title": "Customer feedback review",
+        "summary": "Sam and Nina reviewed this month's customer feedback. The main topics were an Excel export bug with Norwegian characters, a request for dark mode, and mobile app crashes on login.",
         "decisions": [
           "Flag the Excel export encoding issue, since no one has time to work on it this sprint."
         ],
@@ -166,7 +166,7 @@
             "due": "Thursday"
           },
           {
-            "task": "Look into the encoding issue that breaks Excel exports with Norwegian characters.",
+            "task": "Investigate the encoding issue that breaks Excel exports with Norwegian characters.",
             "owner": null,
             "due": null
           },
@@ -177,7 +177,8 @@
           }
         ],
         "open_questions": [
-          "Should a dark mode be added?",
+          "Should a dark mode be added? A few users asked for it, but the team decided not to decide yet.",
+          "Who will fix the Excel export encoding issue, and when?",
           "Why does the mobile app crash on login for some users?"
         ]
       },
@@ -199,31 +200,31 @@
       "attempts": 1,
       "prediction": {
         "title": "Housing Co-op Board Meeting",
-        "summary": "The board approved the 2027 budget with a 4 percent fee increase, agreed to change caretaker company when the current contract ends, and assigned follow-up tasks on quotes, resident communication and parking signs.",
+        "summary": "The board approved the 2027 budget with a 4 percent fee increase and agreed to change caretaker company when the current contract ends. Follow-up tasks on caretaker quotes, resident communication and parking signs were assigned, while EV charging was left undecided.",
         "decisions": [
-          "The 2027 budget is approved.",
-          "Monthly fees will go up 4 percent from January.",
+          "The 2027 budget was approved.",
+          "Monthly fees will increase by 4 percent from January.",
           "The co-op will switch caretaker company when the current contract ends in June."
         ],
         "action_items": [
           {
             "task": "Get three quotes for a new caretaker company.",
-            "owner": "Ola",
-            "due": "before the next meeting"
+            "owner": "Ola Hansen",
+            "due": "Before the next meeting"
           },
           {
             "task": "Send residents information about the higher fees.",
-            "owner": "Fatima",
+            "owner": "Fatima Ali",
             "due": "1 December"
           },
           {
             "task": "Contact the city council about the parking signs.",
-            "owner": "Kari",
+            "owner": "Kari Nordmann",
             "due": null
           }
         ],
         "open_questions": [
-          "Whether to install EV charging in the garage; more information is needed."
+          "Should EV charging be installed in the garage? More information is needed before a decision."
         ]
       },
       "score": {
@@ -244,14 +245,11 @@
       "attempts": 1,
       "prediction": {
         "title": "Offsite Brainstorm on New App Features",
-        "summary": "Alex and Bea held an informal brainstorm with no agenda, floating ideas for new app features such as a voice mode, a weekly digest email and a podcast-style summary. They agreed nothing needed to be decided today.",
+        "summary": "Alex and Bea brainstormed possible app features, including a voice mode, a weekly digest email and a podcast-style summary. They agreed to let the ideas sit and not decide anything yet.",
         "decisions": [],
         "action_items": [],
         "open_questions": [
-          "Should the app add a voice mode?",
-          "Should the app send a weekly digest email?",
-          "Would a podcast-style summary be worth building?",
-          "Which of these features would users prefer?"
+          "Which features would users prefer: a voice mode, a weekly digest email, a podcast-style summary, or a combination?"
         ]
       },
       "score": {
@@ -272,14 +270,14 @@
       "attempts": 1,
       "prediction": {
         "title": "Beta Launch Planning",
-        "summary": "The team confirmed the beta launch date and sorted out release notes, a fix to the signup form, and the scope of the beta. Whether to cap beta signups is still undecided.",
+        "summary": "The team confirmed the beta launch date of the 14th and assigned the release notes and a privacy link fix on the signup form. They also noted that the referral program will not be part of the beta.",
         "decisions": [
           "The beta launch is confirmed for the 14th.",
-          "There will be no referral program for the beta (decided with leadership the day before)."
+          "There will be no referral program for the beta, as decided with leadership."
         ],
         "action_items": [
           {
-            "task": "Write the release notes for the beta launch.",
+            "task": "Write a draft of the release notes.",
             "owner": "li.wei",
             "due": "Wednesday"
           },
@@ -290,12 +288,12 @@
           },
           {
             "task": "Check with infra whether to cap beta signups at 500.",
-            "owner": "dana",
+            "owner": null,
             "due": null
           }
         ],
         "open_questions": [
-          "Should beta signups be capped at 500 or left open?"
+          "Should beta signups be capped at 500 or left open? This needs to be checked with infra."
         ]
       },
       "score": {
@@ -315,8 +313,8 @@
       "case": "08-en-incident-review",
       "attempts": 1,
       "prediction": {
-        "title": "Incident Review: 3 March Web Shop Outage",
-        "summary": "The team reviewed a 40-minute web shop outage on 3 March caused by an expired TLS certificate, with no alert sent before customers complained. They agreed on automatic certificate renewal and expiry monitoring to prevent a repeat.",
+        "title": "Incident review: 3 March web shop outage",
+        "summary": "Review of a 40-minute web shop outage on 3 March caused by an expired TLS certificate, which went unnoticed until customers complained. The team agreed on automatic certificate renewal and expiry monitoring.",
         "decisions": [
           "All certificates will renew automatically with Let's Encrypt from now on.",
           "Jonas will add monitoring that alerts 14 days before a certificate expires."
@@ -339,7 +337,7 @@
           }
         ],
         "open_questions": [
-          "Should customers be informed about the incident?"
+          "Should customers be told about the incident?"
         ]
       },
       "score": {

@@ -19,6 +19,8 @@ class Settings(BaseSettings):
 
     elevenlabs_model: str = "eleven_flash_v2_5"
     elevenlabs_voice_id: str = "JBFqnCBsd6RMkjVDRZzb"
+    stt_model: str = "scribe_v2"
+    max_upload_mb: int = 25
 
     output_dir: Path = Path("out")
     webhook_secret: SecretStr | None = None

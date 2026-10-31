@@ -32,6 +32,9 @@ Rules:
   to someone else later in the meeting, use the final owner.
 - owner is the person's name exactly as written in the transcript. Use null when no one
   clearly owns it ("someone should...", "we need to...").
+- Machine transcripts may label people as "Speaker 1", "Speaker 2". Use a real name only
+  when the conversation makes clear who that speaker is (they are addressed by name and
+  answer). Otherwise use the label, such as "Speaker 2".
 - due is the deadline as stated. Use null when none was given.
 - Write everything in plain English."""
 
