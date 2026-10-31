@@ -3,17 +3,17 @@
     uvicorn meeting_briefer.api:app          # in one terminal
     python scripts/send_webhook.py demo/standup.txt
 
-Signs the body with WEBHOOK_SECRET when it is set.
+Signs the timestamp and body with WEBHOOK_SECRET when it is set.
 """
 
-import hashlib
-import hmac
 import json
 import sys
+import time
 from pathlib import Path
 
 import httpx
 
+from meeting_briefer.api import sign
 from meeting_briefer.config import get_settings
 
 
@@ -27,8 +27,9 @@ def main() -> int:
     headers = {"Content-Type": "application/json"}
     secret = get_settings().webhook_secret
     if secret is not None:
-        digest = hmac.new(secret.get_secret_value().encode(), body, hashlib.sha256).hexdigest()
-        headers["X-Signature"] = f"sha256={digest}"
+        timestamp = str(int(time.time()))
+        headers["X-Timestamp"] = timestamp
+        headers["X-Signature"] = sign(body, timestamp, secret.get_secret_value())
 
     resp = httpx.post(f"{url}/briefings", content=body, headers=headers, timeout=120)
     print(resp.status_code)

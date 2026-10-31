@@ -22,7 +22,7 @@ transcript ──> Claude (structured output) ──> checks ──> briefing sc
 You can use it three ways:
 
 - **Web page** at `http://127.0.0.1:8000`. Paste your own Anthropic and ElevenLabs keys and a transcript, then get the action items, decisions and an audio player.
-- **API:** `POST /briefings` with `{"transcript": "...", "audio": true}`. Keys can come from the `X-Anthropic-Api-Key` and `X-ElevenLabs-Api-Key` headers (bring your own key) or from the server's `.env`. If `WEBHOOK_SECRET` is set, the request must carry an `X-Signature: sha256=<HMAC of the body>` header, like GitHub webhooks.
+- **API:** `POST /briefings` with `{"transcript": "...", "audio": true}`. Keys can come from the `X-Anthropic-Api-Key` and `X-ElevenLabs-Api-Key` headers (bring your own key) or from the server's `.env`. If `WEBHOOK_SECRET` is set, the request must carry an `X-Timestamp` (Unix seconds) and an `X-Signature: sha256=<HMAC of "timestamp.body">` header, like Slack's signing. Requests older than 5 minutes are refused, so a captured request can't be replayed later. Only `Content-Type: application/json` is accepted, which stops another website from posting to a server running on your machine and spending its keys.
 - **CLI:** `meeting-briefer notes.txt [--no-audio] [--out folder]`.
 
 ## Eval results
@@ -72,7 +72,7 @@ Run it:
 uvicorn meeting_briefer.api:app             # web page on http://127.0.0.1:8000
 meeting-briefer demo/standup.txt            # or from the command line
 python evals/run_evals.py                   # eval set
-pytest                                      # 25 tests, no API calls (fake clients)
+pytest                                      # 26 tests, no API calls (fake clients)
 ```
 
 ## Handling secrets
@@ -92,6 +92,7 @@ Each step writes one `key=value` line: extraction attempt, model, seconds, input
 - **The owner check is shallow.** It only checks that the owner's first name appears in the transcript, not that this person actually took the task.
 - **English only,** and the briefing template is fixed, so long meetings make long briefings.
 - **No real Slack app.** The webhook is generic and signed. A Slack slash command would need Slack's own signature format and a background job, because Slack expects a reply within 3 seconds.
+- **Replay protection is time-based only.** A signed request can be resent within its 5-minute window. A production version would also remember recent signatures or delivery ids.
 - **Runs synchronously.** A request takes about 5 to 10 seconds. A real deployment would put the work on a queue.
 - **Audio is stored on local disk,** and anyone with the 12-character run id can fetch it. Bring-your-own-key should only be used over HTTPS or on localhost.
 - **ElevenLabs free plan:** about 10,000 characters a month, no commercial use, and published audio should credit ElevenLabs. The demo voice is George, a premade ElevenLabs voice; audio generated with [elevenlabs.io](https://elevenlabs.io).

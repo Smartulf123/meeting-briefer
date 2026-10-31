@@ -11,6 +11,7 @@ import hashlib
 import hmac
 import logging
 import re
+import time
 from pathlib import Path
 
 import anthropic
@@ -44,12 +45,24 @@ class BriefingResponse(BaseModel):
     attempts: int
 
 
-def verify_signature(body: bytes, header: str | None, secret: str) -> bool:
-    """GitHub-style signature: X-Signature: sha256=<hex HMAC-SHA256 of the raw body>."""
-    if not header or not header.startswith("sha256="):
+MAX_SIGNATURE_AGE = 300  # seconds
+
+
+def sign(body: bytes, timestamp: str, secret: str) -> str:
+    """Slack-style signature over "<timestamp>.<body>", so an old request can't be replayed."""
+    message = timestamp.encode() + b"." + body
+    return "sha256=" + hmac.new(secret.encode(), message, hashlib.sha256).hexdigest()
+
+
+def verify_signature(
+    body: bytes, header: str | None, timestamp: str | None, secret: str, now: float | None = None
+) -> bool:
+    if not header or not timestamp or not timestamp.isdigit():
         return False
-    expected = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
-    return hmac.compare_digest(expected, header.removeprefix("sha256="))
+    now = time.time() if now is None else now
+    if abs(now - int(timestamp)) > MAX_SIGNATURE_AGE:
+        return False
+    return hmac.compare_digest(sign(body, timestamp, secret), header)
 
 
 def with_caller_keys(settings: Settings, anthropic_key: str | None, eleven_key: str | None):
@@ -78,15 +91,24 @@ def create_app(run=pipeline.run) -> FastAPI:
         request: Request,
         settings: Settings = Depends(get_settings),
         x_signature: str | None = Header(default=None),
+        x_timestamp: str | None = Header(default=None),
         x_anthropic_api_key: str | None = Header(default=None),
         x_elevenlabs_api_key: str | None = Header(default=None),
     ) -> BriefingResponse:
+        # Browsers can send text/plain or form posts cross-site without a CORS preflight.
+        # Requiring JSON forces the preflight, so another website can't spend this server's keys.
+        content_type = request.headers.get("content-type", "").split(";")[0].strip().lower()
+        if content_type != "application/json":
+            raise HTTPException(status_code=415, detail="Content-Type must be application/json.")
+
         body = await request.body()
         if settings.webhook_secret is not None:
             secret = settings.webhook_secret.get_secret_value()
-            if not verify_signature(body, x_signature, secret):
-                log.warning("webhook rejected reason=bad_signature")
-                raise HTTPException(status_code=401, detail="Invalid or missing X-Signature.")
+            if not verify_signature(body, x_signature, x_timestamp, secret):
+                log.warning("webhook rejected reason=bad_or_stale_signature")
+                raise HTTPException(
+                    status_code=401, detail="Invalid, missing or expired X-Signature/X-Timestamp."
+                )
 
         try:
             payload = BriefingRequest.model_validate_json(body)

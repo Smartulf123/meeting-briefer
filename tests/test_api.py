@@ -1,12 +1,13 @@
 import hashlib
 import hmac
 import json
+import time
 
 from fastapi.testclient import TestClient
 from pydantic import SecretStr
 
 from meeting_briefer import pipeline
-from meeting_briefer.api import create_app, verify_signature
+from meeting_briefer.api import create_app, sign, verify_signature
 from meeting_briefer.config import get_settings
 from meeting_briefer.extract import ExtractionResult
 
@@ -88,20 +89,41 @@ def test_bad_audio_id_is_404(settings, summary):
     assert make_client(settings, summary).get("/briefings/../../.env/audio").status_code == 404
 
 
+JSON = {"Content-Type": "application/json"}
+
+
 def test_signature_required_when_secret_set(settings, summary):
     settings = settings.model_copy(update={"webhook_secret": SecretStr("s3cret")})
     client = make_client(settings, summary)
     body = json.dumps({"transcript": TRANSCRIPT, "audio": False}).encode()
 
-    assert client.post("/briefings", content=body).status_code == 401
+    assert client.post("/briefings", content=body, headers=JSON).status_code == 401
 
-    sig = "sha256=" + hmac.new(b"s3cret", body, hashlib.sha256).hexdigest()
-    resp = client.post("/briefings", content=body, headers={"X-Signature": sig})
-    assert resp.status_code == 200
+    ts = str(int(time.time()))
+    expected = hmac.new(b"s3cret", ts.encode() + b"." + body, hashlib.sha256).hexdigest()
+    headers = {**JSON, "X-Timestamp": ts, "X-Signature": "sha256=" + expected}
+    assert client.post("/briefings", content=body, headers=headers).status_code == 200
 
 
-def test_verify_signature_rejects_tampered_body():
-    sig = "sha256=" + hmac.new(b"k", b"original", hashlib.sha256).hexdigest()
-    assert verify_signature(b"original", sig, "k")
-    assert not verify_signature(b"tampered", sig, "k")
-    assert not verify_signature(b"original", None, "k")
+def test_verify_signature_rejects_tampered_body_and_replays():
+    now = 1_800_000_000
+    ts = str(now)
+    sig = sign(b"original", ts, "k")
+    assert verify_signature(b"original", sig, ts, "k", now=now)
+    assert not verify_signature(b"tampered", sig, ts, "k", now=now)
+    assert not verify_signature(b"original", None, ts, "k", now=now)
+    assert not verify_signature(b"original", sig, None, "k", now=now)
+    # Same valid signature replayed ten minutes later is refused.
+    assert not verify_signature(b"original", sig, ts, "k", now=now + 600)
+    # Changing the timestamp to look fresh breaks the signature.
+    assert not verify_signature(b"original", sig, str(now + 600), "k", now=now + 600)
+
+
+def test_non_json_post_is_rejected_before_any_work(settings, summary):
+    seen = []
+    client = make_client(settings, summary, seen)
+    body = json.dumps({"transcript": TRANSCRIPT})
+    for content_type in ("text/plain", "application/x-www-form-urlencoded"):
+        resp = client.post("/briefings", content=body, headers={"Content-Type": content_type})
+        assert resp.status_code == 415
+    assert seen == []
