@@ -81,7 +81,7 @@ uvicorn meeting_briefer.api:app             # web page on http://127.0.0.1:8000
 meeting-briefer demo/standup.txt            # or from the command line
 meeting-briefer demo/standup-recording.mp3  # a recording works too
 python evals/run_evals.py                   # eval set
-pytest                                      # 33 tests, no API calls (fake clients)
+pytest                                      # 34 tests, no API calls (fake clients)
 ```
 
 ## Handling secrets

@@ -71,6 +71,21 @@ def test_recording_upload_rejects_forms_and_large_files(settings, summary):
     assert resp.status_code == 413
 
 
+def test_streamed_upload_without_length_is_cut_off(settings, summary):
+    seen = []
+    small = settings.model_copy(update={"max_upload_mb": 1})
+
+    def chunks():  # a generator body is sent chunked, with no Content-Length header
+        for _ in range(3):
+            yield b"x" * (512 * 1024)
+
+    resp = make_client(small, summary, seen).post(
+        "/briefings/audio", content=chunks(), headers={"Content-Type": "audio/mpeg"}
+    )
+    assert resp.status_code == 413
+    assert seen == []
+
+
 def test_health_and_index_page(settings, summary):
     client = make_client(settings, summary)
     assert client.get("/health").json() == {"status": "ok"}

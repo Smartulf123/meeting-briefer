@@ -30,6 +30,7 @@ from .models import MeetingSummary
 log = logging.getLogger(__name__)
 INDEX_HTML = Path(__file__).parent / "static" / "index.html"
 MAX_SIGNATURE_AGE = 300  # seconds
+MAX_JSON_BYTES = 1024 * 1024  # a 100,000-character transcript fits with room to spare
 
 
 class BriefingRequest(BaseModel):
@@ -78,6 +79,25 @@ def with_caller_keys(settings: Settings, anthropic_key: str | None, eleven_key: 
 
 def _media_type(request: Request) -> str:
     return request.headers.get("content-type", "").split(";")[0].strip().lower()
+
+
+async def _read_capped(request: Request, limit: int, what: str) -> bytes:
+    """Read the body in chunks and stop at the limit.
+
+    request.body() would buffer everything first, and a chunked upload has no
+    Content-Length to check up front, so the size has to be counted while reading.
+    """
+    too_big = HTTPException(413, detail=f"{what} is larger than {limit // (1024 * 1024) or 1} MB.")
+    declared = request.headers.get("content-length", "")
+    if declared.isdigit() and int(declared) > limit:
+        raise too_big
+    chunks, total = [], 0
+    async for chunk in request.stream():
+        total += len(chunk)
+        if total > limit:
+            raise too_big
+        chunks.append(chunk)
+    return b"".join(chunks)
 
 
 def _check_signature(settings: Settings, body: bytes, signature, timestamp) -> None:
@@ -142,7 +162,7 @@ def create_app(run=pipeline.run, run_audio=pipeline.run_from_audio) -> FastAPI:
         if _media_type(request) != "application/json":
             raise HTTPException(status_code=415, detail="Content-Type must be application/json.")
 
-        body = await request.body()
+        body = await _read_capped(request, MAX_JSON_BYTES, "Request")
         _check_signature(settings, body, x_signature, x_timestamp)
         try:
             payload = BriefingRequest.model_validate_json(body)
@@ -178,17 +198,7 @@ def create_app(run=pipeline.run, run_audio=pipeline.run_from_audio) -> FastAPI:
         if not media_type.startswith(("audio/", "video/")):
             raise HTTPException(415, detail="Send the recording with an audio/* Content-Type.")
 
-        limit = settings.max_upload_mb * 1024 * 1024
-        declared = request.headers.get("content-length", "")
-        if declared.isdigit() and int(declared) > limit:
-            raise HTTPException(
-                413, detail=f"Recording is larger than {settings.max_upload_mb} MB."
-            )
-        body = await request.body()
-        if len(body) > limit:
-            raise HTTPException(
-                413, detail=f"Recording is larger than {settings.max_upload_mb} MB."
-            )
+        body = await _read_capped(request, settings.max_upload_mb * 1024 * 1024, "Recording")
         if not body:
             raise HTTPException(422, detail="The recording is empty.")
         _check_signature(settings, body, x_signature, x_timestamp)
