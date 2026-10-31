@@ -1,0 +1,10 @@
+{
+  "action_items": [
+    {"owner": "li.wei", "keywords": ["release notes"]},
+    {"owner": "marco", "keywords": ["privacy", "signup form", "link"]}
+  ],
+  "decisions": [
+    ["14", "beta launch"],
+    ["referral"]
+  ]
+}

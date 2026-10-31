@@ -1,0 +1,11 @@
+{
+  "action_items": [
+    {"owner": "Jonas", "keywords": ["pricing page"]},
+    {"owner": "Ahmed", "keywords": ["subject line", "a/b", "onboarding email"]},
+    {"owner": "Maria", "keywords": ["sales"]}
+  ],
+  "decisions": [
+    ["march", "pricing"],
+    ["enterprise", "trial", "demo"]
+  ]
+}

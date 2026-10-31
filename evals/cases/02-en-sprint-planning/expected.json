@@ -1,0 +1,10 @@
+{
+  "action_items": [
+    {"owner": "Erik", "keywords": ["sso", "single sign-on", "sign-on"]},
+    {"owner": "Sofie", "keywords": ["notification", "android", "push", "bug"]},
+    {"owner": "Ingrid", "keywords": ["roadmap", "client"]}
+  ],
+  "decisions": [
+    ["ios 15", "ios15"]
+  ]
+}

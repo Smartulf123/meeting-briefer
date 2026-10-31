@@ -1,0 +1,13 @@
+Product sync, Tuesday
+
+Maria: Okay, let's start. First thing is the pricing page. Legal signed off on the new copy yesterday.
+Jonas: Great. So are we shipping the new pricing on the first of March?
+Maria: Yes, let's lock that in. New pricing goes live March 1st.
+Jonas: Then I'll update the pricing page and have it on staging by Friday.
+Maria: Perfect. Second thing, the onboarding emails. Open rates dropped to 18 percent.
+Ahmed: I can rewrite the subject lines and run an A/B test. I'll have results in two weeks.
+Maria: Good. And we agreed last week to drop the free trial for the enterprise plan, right?
+Jonas: Yes, that's decided. Enterprise goes demo-only.
+Maria: Then I'll tell the sales team about the enterprise change tomorrow.
+Ahmed: One open question is whether we keep the annual discount at 20 percent. Finance hasn't answered.
+Maria: Let's leave that for next week. Thanks, everyone.

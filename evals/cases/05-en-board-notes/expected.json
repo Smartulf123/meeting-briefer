@@ -1,0 +1,11 @@
+{
+  "action_items": [
+    {"owner": "Ola", "keywords": ["quote", "caretaker"]},
+    {"owner": "Fatima", "keywords": ["resident", "fee", "inform"]},
+    {"owner": "Kari", "keywords": ["council", "parking", "sign"]}
+  ],
+  "decisions": [
+    ["budget", "fee", "4 percent", "4%"],
+    ["caretaker"]
+  ]
+}

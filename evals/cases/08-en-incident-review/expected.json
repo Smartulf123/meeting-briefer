@@ -1,0 +1,10 @@
+{
+  "action_items": [
+    {"owner": "Marte", "keywords": ["renewal", "renew", "let's encrypt", "certificate"]},
+    {"owner": "Jonas", "keywords": ["monitor", "alert"]},
+    {"owner": "Henrik", "keywords": ["postmortem", "post-mortem", "report"]}
+  ],
+  "decisions": [
+    ["let's encrypt", "automatic", "renew"]
+  ]
+}

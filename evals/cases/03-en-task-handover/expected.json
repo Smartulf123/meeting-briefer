@@ -1,0 +1,10 @@
+{
+  "action_items": [
+    {"owner": "Priya", "keywords": ["backup", "migrat"]},
+    {"owner": "Tom", "keywords": ["notes"]},
+    {"owner": "Lena", "keywords": ["pagerduty", "on-call", "schedule", "rotation"]}
+  ],
+  "decisions": [
+    ["on-call", "rotation", "weekly"]
+  ]
+}

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>meeting-briefer</title>
+<style>
+  :root { --bg:#fafaf9; --fg:#1c1917; --muted:#78716c; --line:#e7e5e4; --card:#fff; --accent:#1d4ed8; --err:#b91c1c; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#141210; --fg:#f5f5f4; --muted:#a8a29e; --line:#2e2a27; --card:#1c1917; --accent:#93b4ff; --err:#f87171; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.5 system-ui, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; }
+  h2 { font-size: 1.05rem; margin: 24px 0 8px; }
+  p.lead { color: var(--muted); margin: 0 0 24px; }
+  label { display:block; font-weight:600; font-size:.9rem; margin: 14px 0 4px; }
+  .hint { font-weight:400; color:var(--muted); }
+  input[type=password], textarea { width:100%; padding:10px; border:1px solid var(--line); border-radius:8px; background:var(--card); color:var(--fg); font:inherit; }
+  textarea { min-height: 220px; font-family: ui-monospace, monospace; font-size: .85rem; }
+  .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:16px; }
+  button { padding:10px 18px; border-radius:8px; border:1px solid var(--line); background:var(--card); color:var(--fg); font:inherit; cursor:pointer; }
+  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+  @media (prefers-color-scheme: dark) { button.primary { color:#111; } }
+  button:disabled { opacity:.6; cursor:wait; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; margin-top:24px; }
+  table { width:100%; border-collapse:collapse; font-size:.92rem; }
+  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  .error { color: var(--err); margin-top: 16px; }
+  .none { color: var(--muted); font-style: italic; }
+  audio { width:100%; margin-top:8px; }
+  details { margin-top:16px; color:var(--muted); }
+  pre { white-space:pre-wrap; font-size:.8rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>meeting-briefer</h1>
+  <p class="lead">Paste meeting notes. Claude pulls out decisions and action items, and ElevenLabs reads a short briefing aloud.</p>
+
+  <form id="form">
+    <label for="ak">Anthropic API key <span class="hint">(sent with this request only, never stored)</span></label>
+    <input id="ak" type="password" autocomplete="off" placeholder="sk-ant-...">
+    <label for="ek">ElevenLabs API key <span class="hint">(only needed for audio)</span></label>
+    <input id="ek" type="password" autocomplete="off">
+    <label for="tx">Transcript or notes</label>
+    <textarea id="tx" required></textarea>
+    <div class="row">
+      <button class="primary" id="go" type="submit">Make briefing</button>
+      <button type="button" id="example">Load example</button>
+      <label style="margin:0;font-weight:400"><input type="checkbox" id="audio" checked> Generate audio</label>
+    </div>
+    <p class="hint" style="margin-top:12px">Leave the key fields empty if the server has its own keys in .env.</p>
+  </form>
+
+  <div id="error" class="error" hidden></div>
+  <div id="result" class="card" hidden></div>
+</main>
+
+<script>
+const EXAMPLE = `Weekly team sync, Internal Tools
+
+Hanna: Quick one today. First, the support bot. It's answering about 60 percent of tickets now.
+Omar: Agreed that we roll it out to the Spanish queue next. That's the plan for November.
+Hanna: Good, that's decided. Omar, you own the rollout?
+Omar: Yes, I'll have it live in the Spanish queue by the 15th.
+Hanna: Second, the Salesforce sync keeps timing out at night.
+Leo: I'll add retries and an alert to the sync job by Wednesday.
+Hanna: Thanks. Someone also needs to write the runbook for the bot, but nobody has time this week.
+Leo: Open question: do we keep paying for the old transcription tool? Finance hasn't answered.
+Hanna: Let's leave that for next week.`;
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const list = (items) => items.length ? "<ul>" + items.map((i) => `<li>${esc(i)}</li>`).join("") + "</ul>" : '<p class="none">None</p>';
+
+$("example").onclick = () => { $("tx").value = EXAMPLE; };
+
+$("form").onsubmit = async (e) => {
+  e.preventDefault();
+  $("error").hidden = true; $("result").hidden = true;
+  $("go").disabled = true; $("go").textContent = "Working...";
+  const headers = { "Content-Type": "application/json" };
+  if ($("ak").value.trim()) headers["X-Anthropic-Api-Key"] = $("ak").value.trim();
+  if ($("ek").value.trim()) headers["X-ElevenLabs-Api-Key"] = $("ek").value.trim();
+  try {
+    const resp = await fetch("/briefings", {
+      method: "POST", headers,
+      body: JSON.stringify({ transcript: $("tx").value, audio: $("audio").checked, source: "web" }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(typeof data.detail === "string" ? data.detail : JSON.stringify(data.detail));
+    render(data);
+  } catch (err) {
+    $("error").textContent = "Error: " + err.message; $("error").hidden = false;
+  } finally {
+    $("go").disabled = false; $("go").textContent = "Make briefing";
+  }
+};
+
+function render(d) {
+  const s = d.summary;
+  const rows = s.action_items.map((a) =>
+    `<tr><td>${esc(a.task)}</td><td>${a.owner ? esc(a.owner) : '<span class="none">unassigned</span>'}</td><td>${esc(a.due ?? "")}</td></tr>`).join("");
+  $("result").innerHTML = `
+    <h2 style="margin-top:0">${esc(s.title)}</h2>
+    <p>${esc(s.summary)}</p>
+    ${d.audio_url ? `<audio controls src="${esc(d.audio_url)}"></audio>` : ""}
+    <h2>Decisions</h2>${list(s.decisions)}
+    <h2>Action items</h2>
+    ${rows ? `<table><tr><th>Task</th><th>Owner</th><th>Due</th></tr>${rows}</table>` : '<p class="none">None</p>'}
+    <h2>Open questions</h2>${list(s.open_questions)}
+    <details><summary>Briefing script and raw JSON (attempts: ${d.attempts})</summary>
+      <p>${esc(d.script)}</p><pre>${esc(JSON.stringify(s, null, 2))}</pre></details>`;
+  $("result").hidden = false;
+}
+</script>
+</body>
+</html>

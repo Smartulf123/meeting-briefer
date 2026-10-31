@@ -1,0 +1,10 @@
+Ops weekly
+
+Lena: Tom, you were going to migrate the backups to the new storage bucket.
+Tom: Yeah, about that. I'm on parental leave from next Monday, so I won't finish it.
+Priya: I can take the backup migration. Tom, can you send me your notes?
+Tom: Sure, I'll send Priya my notes today.
+Lena: Great, so Priya owns the migration now. Target is end of the month.
+Lena: We also decided to move the on-call rotation to weekly instead of daily. That starts in April.
+Priya: Who is updating the on-call schedule in PagerDuty?
+Lena: I'll do it.

@@ -1,0 +1,11 @@
+#launch-planning thread export
+
+[09:02] dana: morning! quick q, are we still doing the beta launch on the 14th?
+[09:05] li.wei: yes 14th is confirmed, marketing already booked the newsletter slot
+[09:06] dana: nice. then i need the release notes from someone
+[09:10] li.wei: i'll write the release notes, will have a draft by wed :)
+[09:12] marco: fyi the signup form still has the old privacy link
+[09:13] marco: i'll fix it today
+[09:20] dana: also we're NOT doing the referral program for beta, decided w/ leadership yesterday
+[09:21] li.wei: ok good to know
+[09:25] dana: open q: do we cap beta signups at 500 or leave it open? need to check w/ infra

@@ -1,0 +1,12 @@
+Sprint planning, week 12
+
+Ingrid: Let's start. The sprint goal is that single sign-on works in the test environment.
+Erik: I'll take the SSO integration. It should be ready by Thursday.
+Ingrid: Good. We also have a bug where notifications arrive twice on Android.
+Sofie: I can look at that one. I think it's something with the push token.
+Ingrid: Great. We also decided to drop support for iOS 15 from the next release. Everyone agree?
+Erik: Yes, fine by me.
+Sofie: Agreed.
+Ingrid: Then it's decided. I'll update the roadmap and send it to the client by Friday.
+Erik: What about the design for the profile page? It isn't ready yet.
+Ingrid: We'll take that up with the designers next week.

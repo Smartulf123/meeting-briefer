@@ -1,0 +1,27 @@
+{
+  "title": "Internal Tools Weekly Team Sync",
+  "summary": "The team reviewed the support bot's progress and planned its rollout to the Spanish queue, and discussed fixing the nightly timeouts in the Salesforce sync.",
+  "decisions": [
+    "Roll out the support bot to the Spanish queue next, planned for November."
+  ],
+  "action_items": [
+    {
+      "task": "Roll out the support bot to the Spanish queue.",
+      "owner": "Omar",
+      "due": "the 15th"
+    },
+    {
+      "task": "Add retries and an alert to the Salesforce sync job.",
+      "owner": "Leo",
+      "due": "Wednesday"
+    },
+    {
+      "task": "Write the runbook for the support bot.",
+      "owner": null,
+      "due": null
+    }
+  ],
+  "open_questions": [
+    "Should the team keep paying for the old transcription tool? Finance has not answered yet, and it was deferred to next week."
+  ]
+}

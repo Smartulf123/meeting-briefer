@@ -1,0 +1,608 @@
+{
+  "version": 1,
+  "created": "2026-10-31T13:35:00Z",
+  "mode": "standard",
+  "language": "en",
+  "idea": {
+    "text": "meeting-briefer: a small Python portfolio project. A meeting transcript or notes (text file or webhook POST, e.g. from Slack) goes to Claude, which extracts decisions, action items and owners as Pydantic-validated JSON, with retries. A short briefing script is built and spoken with the ElevenLabs text-to-speech API (Norwegian and English). Output: MP3 + JSON summary. FastAPI webhook, eval set of 8 transcripts with a scoring script, logging, .env secrets. Purpose: a job application to ElevenLabs (Internal AI Transformation role). Scope 1-2 days.",
+    "summary": "A Python service that turns meeting transcripts into validated action-item JSON and a spoken audio briefing, for internal teams, as an API/CLI.",
+    "purpose": "me",
+    "purpose_source": "inferred",
+    "form_factors": [
+      "api",
+      "cli"
+    ],
+    "target_user": "internal teams who want a short spoken recap of meetings; in practice a portfolio piece for a hiring manager",
+    "search_terms": [
+      "meeting action items extraction",
+      "meeting notes summarizer llm",
+      "transcript action items",
+      "meeting summary text to speech",
+      "audio briefing elevenlabs",
+      "meeting minutes generator",
+      "standup summary bot slack",
+      "ai meeting assistant",
+      "topic:meeting-notes",
+      "topic:meeting-summarizer"
+    ],
+    "components": [
+      "LLM structured extraction with Pydantic",
+      "text-to-speech audio generation",
+      "webhook API server",
+      "LLM eval / scoring harness"
+    ],
+    "categories": [
+      "ai-sdks",
+      "backend",
+      "music-audio",
+      "observability",
+      "testing"
+    ],
+    "layers": [
+      {
+        "layer": "AI SDK",
+        "category": "ai-sdks"
+      },
+      {
+        "layer": "backend framework",
+        "category": "backend"
+      },
+      {
+        "layer": "text-to-speech / audio",
+        "category": "music-audio"
+      },
+      {
+        "layer": "testing",
+        "category": "testing"
+      },
+      {
+        "layer": "evals / observability",
+        "category": "observability"
+      }
+    ],
+    "look_and_feel": null,
+    "references": []
+  },
+  "competitors": [
+    {
+      "id": "github:inboxpraveen/LLM-Minutes-of-Meeting",
+      "name": "MoM AI (LLM-Minutes-of-Meeting)",
+      "url": "https://github.com/inboxpraveen/LLM-Minutes-of-Meeting",
+      "source": "github",
+      "signals": {
+        "stars": 174,
+        "pushed_at": "2026-09-07T09:27:21Z",
+        "license": "MIT",
+        "archived": false
+      },
+      "match": "direct",
+      "coverage_pct": 55,
+      "match_reason": "Covers recording or transcript to decisions and action items, LLM choice including Anthropic, logs and metrics, ElevenLabs Scribe for transcription. Missing: spoken TTS briefing, Pydantic-validated JSON with retries, webhook input, eval set, Norwegian.",
+      "readme_read": true,
+      "verified": true,
+      "stats_source": "live"
+    },
+    {
+      "id": "github:itsmetamike/vtt-summarizer",
+      "name": "vtt-summarizer",
+      "url": "https://github.com/itsmetamike/vtt-summarizer",
+      "source": "github",
+      "signals": {
+        "stars": 33,
+        "pushed_at": "2024-05-20T18:30:27Z",
+        "license": null,
+        "archived": false
+      },
+      "match": "direct",
+      "coverage_pct": 40,
+      "match_reason": "Transcript file to JSON (overview, decisions, action items) with a second LLM pass to clean the JSON. Missing: Pydantic schema, TTS, webhook, evals.",
+      "readme_read": true,
+      "verified": true,
+      "stats_source": "live"
+    },
+    {
+      "id": "github:Otutu11/Meeting-Summary-Generator",
+      "name": "Meeting-Summary-Generator",
+      "url": "https://github.com/Otutu11/Meeting-Summary-Generator",
+      "source": "github",
+      "signals": {
+        "stars": 53,
+        "pushed_at": "2025-09-16T10:32:33Z",
+        "license": null,
+        "archived": false
+      },
+      "match": "direct",
+      "coverage_pct": 35,
+      "match_reason": "Transcript to summary with decisions and action items via OpenAI, .env key. Missing: validated owners, retries, TTS, webhook, evals, Norwegian.",
+      "readme_read": true,
+      "verified": true,
+      "stats_source": "live"
+    },
+    {
+      "id": "github:Zackriya-Solutions/meetily",
+      "name": "Meetily",
+      "url": "https://github.com/Zackriya-Solutions/meetily",
+      "source": "github",
+      "signals": {
+        "stars": 32337,
+        "pushed_at": "2026-10-31T10:19:40Z",
+        "license": "MIT",
+        "archived": false
+      },
+      "match": "partial",
+      "match_reason": "Most popular self-hosted meeting assistant: local recording, transcription and summaries. A desktop app with no webhook API and no audio briefing.",
+      "readme_read": true,
+      "verified": true,
+      "stats_source": "live"
+    },
+    {
+      "id": "github:Bradybry/Teams-Transcript-Summarizer",
+      "name": "Teams-Transcript-Summarizer",
+      "url": "https://github.com/Bradybry/Teams-Transcript-Summarizer",
+      "source": "github",
+      "signals": {
+        "stars": 33,
+        "pushed_at": "2024-08-02T12:34:16Z",
+        "license": "Unlicense",
+        "archived": false
+      },
+      "match": "partial",
+      "match_reason": "Flask app that summarizes Teams transcripts with GPT-4 or Claude-2 into bullets. No owner extraction, no TTS.",
+      "readme_read": true,
+      "verified": true,
+      "stats_source": "live"
+    },
+    {
+      "id": "github:chulipinho/summit",
+      "name": "Summit",
+      "url": "https://github.com/chulipinho/summit",
+      "source": "github",
+      "signals": {
+        "stars": 26,
+        "pushed_at": "2024-05-15T11:50:24Z",
+        "license": null,
+        "archived": false
+      },
+      "match": "partial",
+      "match_reason": "Gemini summaries of Google Meet recordings sent by email. Text only, no structured action items.",
+      "readme_read": true,
+      "verified": true,
+      "stats_source": "live"
+    },
+    {
+      "id": "commercial:fireflies",
+      "name": "Fireflies.ai",
+      "url": "https://fireflies.ai/blog/fireflies-vs-otter/",
+      "source": "commercial",
+      "signals": {
+        "traction": true
+      },
+      "match": "partial",
+      "match_reason": "Meeting bot with summaries and action items, customizable prompts for owners and deadlines, pushes tasks to other tools. No spoken briefing.",
+      "verified": true
+    },
+    {
+      "id": "commercial:otter",
+      "name": "Otter.ai",
+      "url": "https://circleback.ai/compare/firefliesai-vs-otterai",
+      "source": "commercial",
+      "signals": {
+        "traction": true
+      },
+      "match": "partial",
+      "match_reason": "Notetaker with summaries and assignable action items. Seen only on a third-party comparison page.",
+      "verified": true
+    },
+    {
+      "id": "commercial:zoom-ai-companion",
+      "name": "Zoom AI Companion",
+      "url": "https://uis.georgetown.edu/zoom/zoom-ai/",
+      "source": "commercial",
+      "signals": {
+        "traction": true
+      },
+      "match": "partial",
+      "match_reason": "Built-in Zoom summaries with action items, emailed after the meeting. Seen on a university IT page.",
+      "verified": true
+    },
+    {
+      "id": "skills:nousresearch/hermes-agent/meeting-action-items",
+      "name": "meeting-action-items (agent skill)",
+      "url": "https://skills.sh/nousresearch/hermes-agent/meeting-action-items",
+      "source": "skills.sh",
+      "signals": {
+        "installs": 133
+      },
+      "match": "adjacent",
+      "match_reason": "Prompt-level agent skill for action items.",
+      "verified": true
+    },
+    {
+      "id": "github:Vexa-ai/vexa",
+      "name": "Vexa",
+      "url": "https://github.com/Vexa-ai/vexa",
+      "source": "github",
+      "signals": {
+        "stars": 2934,
+        "pushed_at": "2026-10-31T12:09:39Z",
+        "license": "Apache-2.0",
+        "archived": false
+      },
+      "match": "adjacent",
+      "match_reason": "Open-source meeting transcription API, an upstream source of transcripts.",
+      "readme_read": true,
+      "verified": true,
+      "stats_source": "live"
+    }
+  ],
+  "candidates_evaluated": 34,
+  "market_signals": [],
+  "gaps": [
+    {
+      "statement": "None of the open-source meeting summarizers found turns the result into a spoken briefing; MoM AI uses ElevenLabs only for speech-to-text.",
+      "evidence": [
+        "https://github.com/inboxpraveen/LLM-Minutes-of-Meeting",
+        "https://github.com/itsmetamike/vtt-summarizer"
+      ],
+      "checked": [
+        "MoM AI README",
+        "vtt-summarizer README",
+        "Meeting-Summary-Generator README",
+        "GitHub search 'audio briefing elevenlabs' (no results above 20 stars)"
+      ]
+    },
+    {
+      "statement": "None of them ships an eval set that measures extraction quality, so there is no number behind 'it finds the action items'.",
+      "evidence": [
+        "https://github.com/inboxpraveen/LLM-Minutes-of-Meeting",
+        "https://github.com/Otutu11/Meeting-Summary-Generator"
+      ],
+      "checked": [
+        "MoM AI README",
+        "Meeting-Summary-Generator README",
+        "vtt-summarizer README"
+      ]
+    }
+  ],
+  "building_blocks": [
+    {
+      "id": "github:anthropics/anthropic-sdk-python",
+      "name": "Anthropic Python SDK",
+      "url": "https://github.com/anthropics/anthropic-sdk-python",
+      "layer": "AI SDK",
+      "role": "pick",
+      "type": "use",
+      "license_class": "permissive",
+      "signals": {
+        "stars": 3975,
+        "license": "MIT",
+        "pushed_at": "2026-10-15T19:45:15Z",
+        "archived": false
+      },
+      "from_catalog": true,
+      "readme_read": true,
+      "why": "Official Claude client; messages.parse returns a validated Pydantic object.",
+      "warning": "Structured outputs ignore some schema constraints such as string length, so validate the rest yourself.",
+      "verified": true,
+      "stats_source": "snapshot 2026-10-17"
+    },
+    {
+      "id": "github:567-labs/instructor",
+      "name": "Instructor",
+      "url": "https://github.com/567-labs/instructor",
+      "layer": "AI SDK",
+      "role": "alternative",
+      "type": "use",
+      "license_class": "permissive",
+      "signals": {
+        "stars": 14026,
+        "license": "MIT",
+        "pushed_at": "2026-10-14T22:21:57Z",
+        "archived": false
+      },
+      "from_catalog": true,
+      "readme_read": true,
+      "why": "Pydantic outputs with automatic retries on validation errors.",
+      "warning": "An extra dependency; a hand-written retry loop shows more of your own work.",
+      "verified": true,
+      "stats_source": "snapshot 2026-10-17"
+    },
+    {
+      "id": "github:fastapi/fastapi",
+      "name": "FastAPI",
+      "url": "https://github.com/fastapi/fastapi",
+      "layer": "backend framework",
+      "role": "pick",
+      "type": "use",
+      "license_class": "permissive",
+      "signals": {
+        "stars": 103167,
+        "license": "MIT",
+        "pushed_at": "2026-10-16T14:13:36Z",
+        "archived": false
+      },
+      "from_catalog": true,
+      "readme_read": true,
+      "why": "Pydantic request and response models, OpenAPI docs and TestClient for the webhook.",
+      "verified": true,
+      "stats_source": "snapshot 2026-10-17"
+    },
+    {
+      "id": "github:Kludex/uvicorn",
+      "name": "uvicorn",
+      "url": "https://github.com/Kludex/uvicorn",
+      "layer": "backend framework",
+      "role": "pick",
+      "type": "use",
+      "license_class": "permissive",
+      "signals": {
+        "stars": 11055,
+        "license": "BSD-3-Clause",
+        "pushed_at": "2026-10-25T13:37:00Z",
+        "archived": false
+      },
+      "from_catalog": false,
+      "readme_read": true,
+      "why": "The ASGI server for FastAPI.",
+      "verified": true,
+      "stats_source": "live"
+    },
+    {
+      "id": "github:pydantic/pydantic-settings",
+      "name": "pydantic-settings",
+      "url": "https://github.com/pydantic/pydantic-settings",
+      "component": "webhook API server",
+      "role": "pick",
+      "type": "use",
+      "license_class": "permissive",
+      "signals": {
+        "stars": 1493,
+        "license": "MIT",
+        "pushed_at": "2026-10-30T16:25:58Z",
+        "archived": false
+      },
+      "from_catalog": false,
+      "readme_read": true,
+      "why": "Typed .env loading for the API keys.",
+      "verified": true,
+      "stats_source": "live"
+    },
+    {
+      "id": "github:elevenlabs/elevenlabs-python",
+      "name": "ElevenLabs Python SDK",
+      "url": "https://github.com/elevenlabs/elevenlabs-python",
+      "layer": "text-to-speech / audio",
+      "role": "pick",
+      "type": "use",
+      "license_class": "permissive",
+      "signals": {
+        "stars": 3168,
+        "license": null,
+        "pushed_at": "2026-10-30T19:21:45Z",
+        "archived": false
+      },
+      "from_catalog": false,
+      "readme_read": true,
+      "why": "Official SDK with text_to_speech.convert; the README lists eleven_flash_v2_5 with 32 languages.",
+      "warning": "GitHub reports no license; PyPI metadata says MIT.",
+      "verified": true,
+      "stats_source": "live"
+    },
+    {
+      "id": "github:OpenBMB/VoxCPM",
+      "name": "VoxCPM2",
+      "url": "https://github.com/OpenBMB/VoxCPM",
+      "layer": "text-to-speech / audio",
+      "role": "alternative",
+      "type": "use",
+      "license_class": "permissive",
+      "signals": {
+        "stars": 39469,
+        "license": "Apache-2.0",
+        "pushed_at": "2026-10-08T03:26:41Z",
+        "archived": false
+      },
+      "from_catalog": true,
+      "readme_read": true,
+      "why": "Open local TTS with Norwegian in its language list.",
+      "warning": "Needs a GPU, and it is a competitor's model in an ElevenLabs application.",
+      "verified": true,
+      "stats_source": "snapshot 2026-10-17"
+    },
+    {
+      "id": "github:pytest-dev/pytest",
+      "name": "pytest",
+      "url": "https://github.com/pytest-dev/pytest",
+      "layer": "testing",
+      "role": "pick",
+      "type": "use",
+      "license_class": "permissive",
+      "signals": {
+        "stars": 14605,
+        "license": "MIT",
+        "pushed_at": "2026-10-17T08:12:23Z",
+        "archived": false
+      },
+      "from_catalog": true,
+      "readme_read": true,
+      "why": "Unit tests with fake clients, so tests cost no API credits.",
+      "verified": true,
+      "stats_source": "snapshot 2026-10-17"
+    },
+    {
+      "id": "github:pydantic/pydantic-ai",
+      "name": "Pydantic Evals",
+      "url": "https://github.com/pydantic/pydantic-ai",
+      "layer": "evals / observability",
+      "role": "alternative",
+      "type": "use",
+      "license_class": "permissive",
+      "signals": {
+        "stars": 20678,
+        "license": "MIT",
+        "pushed_at": "2026-10-17T13:48:50Z",
+        "archived": false
+      },
+      "from_catalog": true,
+      "readme_read": true,
+      "why": "Pydantic-native datasets and evaluators with no server.",
+      "verified": true,
+      "stats_source": "snapshot 2026-10-17"
+    },
+    {
+      "id": "github:promptfoo/promptfoo",
+      "name": "promptfoo",
+      "url": "https://github.com/promptfoo/promptfoo",
+      "component": "LLM eval / scoring harness",
+      "role": "alternative",
+      "type": "use",
+      "license_class": "permissive",
+      "signals": {
+        "stars": 26668,
+        "license": "MIT",
+        "pushed_at": "2026-10-31T09:22:08Z",
+        "archived": false
+      },
+      "from_catalog": false,
+      "readme_read": true,
+      "why": "YAML test cases and side-by-side model comparison.",
+      "warning": "A Node CLI; heavy for 8 transcripts.",
+      "verified": true,
+      "stats_source": "live"
+    },
+    {
+      "id": "github:confident-ai/deepeval",
+      "name": "DeepEval",
+      "url": "https://github.com/confident-ai/deepeval",
+      "component": "LLM eval / scoring harness",
+      "role": "alternative",
+      "type": "use",
+      "license_class": "permissive",
+      "signals": {
+        "stars": 19213,
+        "license": "Apache-2.0",
+        "pushed_at": "2026-10-29T10:36:04Z",
+        "archived": false
+      },
+      "from_catalog": false,
+      "readme_read": true,
+      "why": "Pytest-style LLM tests with ready-made metrics.",
+      "warning": "Most metrics use an LLM judge, which adds cost and noise.",
+      "verified": true,
+      "stats_source": "live"
+    },
+    {
+      "id": "skills:fastapi/fastapi/fastapi",
+      "name": "FastAPI official skill",
+      "url": "https://skills.sh/fastapi/fastapi/fastapi",
+      "layer": "agent skill",
+      "role": "pick",
+      "type": "use",
+      "license_class": "permissive",
+      "signals": {
+        "installs": 14055
+      },
+      "from_catalog": false,
+      "readme_read": true,
+      "why": "Official FastAPI best practices, Pydantic models, dependencies, async vs sync.",
+      "verified": true
+    },
+    {
+      "id": "skills:elevenlabs/skills/text-to-speech",
+      "name": "ElevenLabs text-to-speech skill",
+      "url": "https://skills.sh/elevenlabs/skills/text-to-speech",
+      "layer": "agent skill",
+      "role": "pick",
+      "type": "use",
+      "license_class": "permissive",
+      "signals": {
+        "installs": 17782
+      },
+      "from_catalog": false,
+      "readme_read": true,
+      "why": "Official ElevenLabs TTS usage for Python and JS.",
+      "warning": "Defaults to eleven_v4; its setup step runs the ElevenLabs CLI, so read it first.",
+      "verified": true
+    },
+    {
+      "id": "skills:pydantic/skills/pydantic",
+      "name": "Pydantic official skill",
+      "url": "https://skills.sh/pydantic/skills/pydantic",
+      "layer": "agent skill",
+      "role": "alternative",
+      "type": "use",
+      "license_class": "permissive",
+      "signals": {
+        "installs": 2263
+      },
+      "from_catalog": false,
+      "readme_read": true,
+      "why": "Model design and constraints for the schema.",
+      "verified": true
+    }
+  ],
+  "inspiration": [
+    {
+      "name": "MoM AI (LLM-Minutes-of-Meeting)",
+      "url": "https://github.com/inboxpraveen/LLM-Minutes-of-Meeting",
+      "kind": "website",
+      "look_at": "how it attributes decisions and action items to speakers, and its health and metrics endpoints",
+      "study_with": "read the README and code",
+      "verified": true
+    },
+    {
+      "name": "Fireflies.ai",
+      "url": "https://fireflies.ai/blog/fireflies-vs-otter/",
+      "kind": "website",
+      "look_at": "the customizable action-item fields (owner, deadline, dependencies)",
+      "study_with": "read the page and its sample outputs",
+      "verified": true
+    },
+    {
+      "name": "Agent audio briefs with ElevenLabs",
+      "url": "https://www.developersdigest.tech/blog/agent-audio-briefs-elevenlabs",
+      "kind": "website",
+      "look_at": "how it writes text for the ear before calling TTS",
+      "study_with": "read the guide",
+      "verified": true
+    }
+  ],
+  "sources_status": {
+    "catalog": "ok",
+    "github": "ok",
+    "skills": "ok",
+    "plugins": "ok",
+    "mcp": "ok",
+    "npm": "skipped",
+    "pypi": "ok",
+    "hn": "skipped",
+    "web": "ok"
+  },
+  "rate_limited": false,
+  "verification": {
+    "checked": 28,
+    "passed": 28,
+    "corrected": 0,
+    "dropped": 0,
+    "verified_at": "2026-10-31T12:36:37.998Z"
+  },
+  "scores": {
+    "saturation": 8.7,
+    "gap": null
+  },
+  "score_details": {
+    "coverage": 2
+  },
+  "verdict": {
+    "code": null,
+    "rule": null,
+    "reason": "No verdict for fun or personal projects.",
+    "confidence": "high"
+  },
+  "display": {
+    "headline": "Building for yourself: tools that already exist and what to build with",
+    "hint": "Existing tools might save you time. Building your own is still a fine choice.",
+    "show_verdict": false
+  },
+  "scored_at": "2026-10-31T12:36:38.151Z"
+}

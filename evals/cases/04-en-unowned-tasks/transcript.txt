@@ -1,0 +1,9 @@
+Customer feedback review
+
+Sam: The top complaint this month is that exports to Excel break with Norwegian characters.
+Nina: Someone should really look into the encoding issue. It's been open for months.
+Sam: Agreed, but none of us has time this sprint. Let's flag it.
+Nina: Maybe we could add a dark mode? A few people asked.
+Sam: Maybe. Let's not decide anything on that yet.
+Nina: I'll write up the feedback summary and share it in the product channel by Thursday.
+Sam: Thanks. We also need to find out why the mobile app crashes on login for some users.

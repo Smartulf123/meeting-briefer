@@ -1,0 +1,9 @@
+Incident review, outage on 3 March
+
+Henrik: The web shop was down for 40 minutes. The cause was an expired TLS certificate.
+Marte: Yes, and nobody got an alert before customers complained.
+Henrik: We've decided that all certificates will renew automatically with Let's Encrypt from now on.
+Marte: I'll set up automatic renewal on all domains by next Friday.
+Jonas: I can add monitoring that alerts us 14 days before a certificate expires.
+Henrik: Good, do that, Jonas. I'll write the postmortem and share it on Monday.
+Marte: Should we tell customers about the incident? We haven't settled that.

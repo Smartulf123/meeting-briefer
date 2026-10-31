@@ -1,0 +1,359 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "cases_run": 8,
+  "cases_failed": 0,
+  "input_tokens": 10749,
+  "output_tokens": 2229,
+  "seconds": 26.8,
+  "metrics": {
+    "action_precision": 0.9090909090909091,
+    "action_recall": 1.0,
+    "action_f1": 0.9523809523809523,
+    "owner_accuracy": 1.0,
+    "decision_recall": 1.0,
+    "decision_precision": 0.7142857142857143
+  },
+  "cases": [
+    {
+      "case": "01-en-product-sync",
+      "attempts": 1,
+      "prediction": {
+        "title": "Product Sync: Pricing, Onboarding, Enterprise Plan",
+        "summary": "The team confirmed the launch date for the new pricing, discussed falling open rates on onboarding emails, and confirmed the enterprise plan change to demo-only.",
+        "decisions": [
+          "New pricing goes live on March 1st.",
+          "The free trial for the enterprise plan is dropped; enterprise goes demo-only."
+        ],
+        "action_items": [
+          {
+            "task": "Update the pricing page and have it on staging.",
+            "owner": "Jonas",
+            "due": "Friday"
+          },
+          {
+            "task": "Rewrite onboarding email subject lines and run an A/B test.",
+            "owner": "Ahmed",
+            "due": "in two weeks"
+          },
+          {
+            "task": "Tell the sales team about the enterprise plan change.",
+            "owner": "Maria",
+            "due": "tomorrow"
+          }
+        ],
+        "open_questions": [
+          "Should the annual discount stay at 20 percent? Finance has not answered yet, and it was left for next week."
+        ]
+      },
+      "score": {
+        "expected_actions": 3,
+        "predicted_actions": 3,
+        "matched_actions": 3,
+        "tasks_found": 3,
+        "owners_correct": 3,
+        "expected_decisions": 2,
+        "predicted_decisions": 2,
+        "decisions_found": 2,
+        "decisions_supported": 2
+      },
+      "error": null
+    },
+    {
+      "case": "02-en-sprint-planning",
+      "attempts": 1,
+      "prediction": {
+        "title": "Sprint Planning Week 12",
+        "summary": "The team set the sprint goal of getting single sign-on working in the test environment, assigned work on SSO and an Android notification bug, and agreed to drop iOS 15 support from the next release.",
+        "decisions": [
+          "The sprint goal is for single sign-on to work in the test environment.",
+          "Support for iOS 15 will be dropped from the next release."
+        ],
+        "action_items": [
+          {
+            "task": "Complete the SSO integration.",
+            "owner": "Erik",
+            "due": "Thursday"
+          },
+          {
+            "task": "Investigate the bug where notifications arrive twice on Android.",
+            "owner": "Sofie",
+            "due": null
+          },
+          {
+            "task": "Update the roadmap and send it to the client.",
+            "owner": "Ingrid",
+            "due": "Friday"
+          },
+          {
+            "task": "Discuss the profile page design with the designers.",
+            "owner": null,
+            "due": "next week"
+          }
+        ],
+        "open_questions": [
+          "The design for the profile page is not ready yet; to be taken up with the designers next week."
+        ]
+      },
+      "score": {
+        "expected_actions": 3,
+        "predicted_actions": 4,
+        "matched_actions": 3,
+        "tasks_found": 3,
+        "owners_correct": 3,
+        "expected_decisions": 1,
+        "predicted_decisions": 2,
+        "decisions_found": 1,
+        "decisions_supported": 1
+      },
+      "error": null
+    },
+    {
+      "case": "03-en-task-handover",
+      "attempts": 1,
+      "prediction": {
+        "title": "Ops Weekly: Backup Migration and On-Call Rotation",
+        "summary": "The team reassigned the backup migration from Tom to Priya because Tom's parental leave starts next Monday. They also confirmed that the on-call rotation will change from daily to weekly starting in April.",
+        "decisions": [
+          "Priya takes over the backup migration from Tom, with a target of end of the month.",
+          "The on-call rotation moves from daily to weekly, starting in April."
+        ],
+        "action_items": [
+          {
+            "task": "Migrate the backups to the new storage bucket.",
+            "owner": "Priya",
+            "due": "end of the month"
+          },
+          {
+            "task": "Send Priya the notes on the backup migration.",
+            "owner": "Tom",
+            "due": "today"
+          },
+          {
+            "task": "Update the on-call schedule in PagerDuty to the weekly rotation.",
+            "owner": "Lena",
+            "due": null
+          }
+        ],
+        "open_questions": []
+      },
+      "score": {
+        "expected_actions": 3,
+        "predicted_actions": 3,
+        "matched_actions": 3,
+        "tasks_found": 3,
+        "owners_correct": 3,
+        "expected_decisions": 1,
+        "predicted_decisions": 2,
+        "decisions_found": 1,
+        "decisions_supported": 1
+      },
+      "error": null
+    },
+    {
+      "case": "04-en-unowned-tasks",
+      "attempts": 1,
+      "prediction": {
+        "title": "Customer Feedback Review",
+        "summary": "Sam and Nina reviewed this month's customer feedback, including Excel export failures with Norwegian characters, requests for dark mode, and mobile app login crashes.",
+        "decisions": [
+          "Flag the Excel export encoding issue, since no one has time to work on it this sprint."
+        ],
+        "action_items": [
+          {
+            "task": "Write up the feedback summary and share it in the product channel.",
+            "owner": "Nina",
+            "due": "Thursday"
+          },
+          {
+            "task": "Look into the encoding issue that breaks Excel exports with Norwegian characters.",
+            "owner": null,
+            "due": null
+          },
+          {
+            "task": "Find out why the mobile app crashes on login for some users.",
+            "owner": null,
+            "due": null
+          }
+        ],
+        "open_questions": [
+          "Should a dark mode be added?",
+          "Why does the mobile app crash on login for some users?"
+        ]
+      },
+      "score": {
+        "expected_actions": 3,
+        "predicted_actions": 3,
+        "matched_actions": 3,
+        "tasks_found": 3,
+        "owners_correct": 3,
+        "expected_decisions": 0,
+        "predicted_decisions": 1,
+        "decisions_found": 0,
+        "decisions_supported": 0
+      },
+      "error": null
+    },
+    {
+      "case": "05-en-board-notes",
+      "attempts": 1,
+      "prediction": {
+        "title": "Housing Co-op Board Meeting",
+        "summary": "The board approved the 2027 budget with a 4 percent fee increase, agreed to change caretaker company when the current contract ends, and assigned follow-up tasks on quotes, resident communication and parking signs.",
+        "decisions": [
+          "The 2027 budget is approved.",
+          "Monthly fees will go up 4 percent from January.",
+          "The co-op will switch caretaker company when the current contract ends in June."
+        ],
+        "action_items": [
+          {
+            "task": "Get three quotes for a new caretaker company.",
+            "owner": "Ola",
+            "due": "before the next meeting"
+          },
+          {
+            "task": "Send residents information about the higher fees.",
+            "owner": "Fatima",
+            "due": "1 December"
+          },
+          {
+            "task": "Contact the city council about the parking signs.",
+            "owner": "Kari",
+            "due": null
+          }
+        ],
+        "open_questions": [
+          "Whether to install EV charging in the garage; more information is needed."
+        ]
+      },
+      "score": {
+        "expected_actions": 3,
+        "predicted_actions": 3,
+        "matched_actions": 3,
+        "tasks_found": 3,
+        "owners_correct": 3,
+        "expected_decisions": 2,
+        "predicted_decisions": 3,
+        "decisions_found": 2,
+        "decisions_supported": 3
+      },
+      "error": null
+    },
+    {
+      "case": "06-en-brainstorm-no-actions",
+      "attempts": 1,
+      "prediction": {
+        "title": "Offsite Brainstorm on New App Features",
+        "summary": "Alex and Bea held an informal brainstorm with no agenda, floating ideas for new app features such as a voice mode, a weekly digest email and a podcast-style summary. They agreed nothing needed to be decided today.",
+        "decisions": [],
+        "action_items": [],
+        "open_questions": [
+          "Should the app add a voice mode?",
+          "Should the app send a weekly digest email?",
+          "Would a podcast-style summary be worth building?",
+          "Which of these features would users prefer?"
+        ]
+      },
+      "score": {
+        "expected_actions": 0,
+        "predicted_actions": 0,
+        "matched_actions": 0,
+        "tasks_found": 0,
+        "owners_correct": 0,
+        "expected_decisions": 0,
+        "predicted_decisions": 0,
+        "decisions_found": 0,
+        "decisions_supported": 0
+      },
+      "error": null
+    },
+    {
+      "case": "07-en-slack-thread",
+      "attempts": 1,
+      "prediction": {
+        "title": "Beta Launch Planning",
+        "summary": "The team confirmed the beta launch date and sorted out release notes, a fix to the signup form, and the scope of the beta. Whether to cap beta signups is still undecided.",
+        "decisions": [
+          "The beta launch is confirmed for the 14th.",
+          "There will be no referral program for the beta (decided with leadership the day before)."
+        ],
+        "action_items": [
+          {
+            "task": "Write the release notes for the beta launch.",
+            "owner": "li.wei",
+            "due": "Wednesday"
+          },
+          {
+            "task": "Fix the old privacy link on the signup form.",
+            "owner": "marco",
+            "due": "today"
+          },
+          {
+            "task": "Check with infra whether to cap beta signups at 500.",
+            "owner": "dana",
+            "due": null
+          }
+        ],
+        "open_questions": [
+          "Should beta signups be capped at 500 or left open?"
+        ]
+      },
+      "score": {
+        "expected_actions": 2,
+        "predicted_actions": 3,
+        "matched_actions": 2,
+        "tasks_found": 2,
+        "owners_correct": 2,
+        "expected_decisions": 2,
+        "predicted_decisions": 2,
+        "decisions_found": 2,
+        "decisions_supported": 2
+      },
+      "error": null
+    },
+    {
+      "case": "08-en-incident-review",
+      "attempts": 1,
+      "prediction": {
+        "title": "Incident Review: 3 March Web Shop Outage",
+        "summary": "The team reviewed a 40-minute web shop outage on 3 March caused by an expired TLS certificate, with no alert sent before customers complained. They agreed on automatic certificate renewal and expiry monitoring to prevent a repeat.",
+        "decisions": [
+          "All certificates will renew automatically with Let's Encrypt from now on.",
+          "Jonas will add monitoring that alerts 14 days before a certificate expires."
+        ],
+        "action_items": [
+          {
+            "task": "Set up automatic certificate renewal on all domains.",
+            "owner": "Marte",
+            "due": "next Friday"
+          },
+          {
+            "task": "Add monitoring that alerts 14 days before a certificate expires.",
+            "owner": "Jonas",
+            "due": null
+          },
+          {
+            "task": "Write the postmortem and share it.",
+            "owner": "Henrik",
+            "due": "Monday"
+          }
+        ],
+        "open_questions": [
+          "Should customers be informed about the incident?"
+        ]
+      },
+      "score": {
+        "expected_actions": 3,
+        "predicted_actions": 3,
+        "matched_actions": 3,
+        "tasks_found": 3,
+        "owners_correct": 3,
+        "expected_decisions": 1,
+        "predicted_decisions": 2,
+        "decisions_found": 1,
+        "decisions_supported": 1
+      },
+      "error": null
+    }
+  ]
+}
