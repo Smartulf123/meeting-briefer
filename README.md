@@ -4,6 +4,10 @@
 
 Give it a meeting recording or the notes from one. ElevenLabs Scribe turns the recording into a transcript, Claude pulls out the decisions, action items and owners as validated JSON, and ElevenLabs reads a short briefing aloud.
 
+[![Meeting Briefer, 30-second demo: click to watch with sound](docs/demo/poster.jpg)](docs/demo/meeting-briefer-demo.mp4)
+
+**Watch the 30-second demo** ([MP4, with sound](docs/demo/meeting-briefer-demo.mp4)). The briefing voice in it is the app's real ElevenLabs output. The narrator is a local AI voice, and I made the video with Cutscene, my own AI video tool.
+
 **Demo, text in:** [demo/output/briefing.mp3](demo/output/briefing.mp3) (41 seconds), made from [demo/standup.txt](demo/standup.txt). The JSON it produced is in [demo/output/summary.json](demo/output/summary.json).
 
 **Demo, audio in:** [demo/standup-recording.mp3](demo/standup-recording.mp3) is a 37-second, three-person meeting. [demo/from-recording](demo/from-recording) holds what came out: the [transcript](demo/from-recording/transcript.txt) with speaker labels, the [JSON](demo/from-recording/summary.json) and the [spoken briefing](demo/from-recording/briefing.mp3). The recording isn't a real meeting. I made it from the same notes with three ElevenLabs voices ([scripts/make_test_recording.py](scripts/make_test_recording.py)), so the audio path can be tested without recording anyone.
