@@ -93,6 +93,16 @@ def test_health_and_index_page(settings, summary):
     assert page.status_code == 200 and "X-Anthropic-Api-Key" in page.text
 
 
+def test_status_reports_only_whether_keys_exist(settings, summary):
+    body = make_client(settings, summary).get("/status").json()
+    assert body["server_keys"] == {"anthropic": False, "elevenlabs": False}
+
+    with_key = settings.model_copy(update={"anthropic_api_key": SecretStr("sk-ant-secret")})
+    resp = make_client(with_key, summary).get("/status")
+    assert resp.json()["server_keys"]["anthropic"] is True
+    assert "sk-ant-secret" not in resp.text
+
+
 def test_caller_keys_are_used_for_that_request_only(settings, summary):
     seen = []
     client = make_client(settings, summary, seen)

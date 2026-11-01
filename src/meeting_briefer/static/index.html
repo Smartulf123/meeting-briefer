@@ -3,61 +3,263 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>meeting-briefer</title>
+<title>Meeting Briefer</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231d4ed8'/%3E%3Cpath d='M9 13v6M14 9v14M19 12v8M24 15v2' stroke='white' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
-  :root { --bg:#fafaf9; --fg:#1c1917; --muted:#78716c; --line:#e7e5e4; --card:#fff; --accent:#1d4ed8; --err:#b91c1c; }
+  :root {
+    --bg:#fafaf9; --surface:#ffffff; --raised:#f5f5f4; --line:#e7e5e4; --fg:#1c1917; --muted:#78716c;
+    --accent:#1d4ed8; --on-accent:#ffffff; --err:#b91c1c; --ok:#15803d;
+    --soft: color-mix(in srgb, var(--accent) 10%, transparent);
+    --radius: 12px;
+    --font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    color-scheme: light dark;
+  }
   @media (prefers-color-scheme: dark) {
-    :root { --bg:#141210; --fg:#f5f5f4; --muted:#a8a29e; --line:#2e2a27; --card:#1c1917; --accent:#93b4ff; --err:#f87171; }
+    :root {
+      --bg:#141210; --surface:#1c1917; --raised:#24201d; --line:#2e2a27; --fg:#f5f5f4; --muted:#a8a29e;
+      --accent:#93b4ff; --on-accent:#141210; --err:#f87171; --ok:#86efac;
+    }
   }
   * { box-sizing: border-box; }
-  body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.5 system-ui, sans-serif; }
-  main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
-  h1 { font-size: 1.6rem; margin: 0 0 4px; }
-  h2 { font-size: 1.05rem; margin: 24px 0 8px; }
-  p.lead { color: var(--muted); margin: 0 0 24px; }
-  label { display:block; font-weight:600; font-size:.9rem; margin: 14px 0 4px; }
-  .hint { font-weight:400; color:var(--muted); }
-  input[type=password], textarea { width:100%; padding:10px; border:1px solid var(--line); border-radius:8px; background:var(--card); color:var(--fg); font:inherit; }
-  textarea { min-height: 220px; font-family: ui-monospace, monospace; font-size: .85rem; }
-  .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:16px; }
-  button { padding:10px 18px; border-radius:8px; border:1px solid var(--line); background:var(--card); color:var(--fg); font:inherit; cursor:pointer; }
-  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
-  @media (prefers-color-scheme: dark) { button.primary { color:#111; } }
-  button:disabled { opacity:.6; cursor:wait; }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; margin-top:24px; }
-  table { width:100%; border-collapse:collapse; font-size:.92rem; }
-  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
-  .error { color: var(--err); margin-top: 16px; }
-  .none { color: var(--muted); font-style: italic; }
-  audio { width:100%; margin-top:8px; }
-  details { margin-top:16px; color:var(--muted); }
-  pre { white-space:pre-wrap; font-size:.8rem; }
+  html, body { margin:0; background:var(--bg); color:var(--fg); }
+  body { font: 15px/1.55 var(--font); -webkit-font-smoothing: antialiased; }
+  button, input, textarea { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  [hidden] { display: none !important; }
+
+  /* Top bar */
+  .bar { position: sticky; top:0; z-index: 5; background: color-mix(in srgb, var(--bg) 88%, transparent);
+         backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  .bar-inner { max-width: 1180px; margin: 0 auto; padding: 12px 24px; display:flex; align-items:center; gap:16px; }
+  .brand { display:flex; align-items:center; gap:10px; font-weight: 650; font-size: 16px; letter-spacing: -0.01em; }
+  .brand svg { width: 28px; height: 28px; flex: none; }
+  .brand small { font-weight: 400; color: var(--muted); font-size: 14px; letter-spacing: 0; }
+  .bar .spacer { flex: 1; }
+  .keys-toggle { display:flex; align-items:center; gap:8px; padding: 7px 12px; border-radius: 999px;
+                 border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-size: 14px; }
+  .keys-toggle:hover { border-color: var(--muted); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+  .dot.ready { background: var(--ok); }
+  .dot.needed { background: var(--err); }
+
+  .keys { border-bottom: 1px solid var(--line); background: var(--surface); }
+  .keys-inner { max-width: 1180px; margin: 0 auto; padding: 18px 24px 20px; display:grid;
+                grid-template-columns: 1fr 1fr auto; gap: 16px; align-items: end; }
+  .keys p { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: 13.5px; }
+
+  /* Layout */
+  main { max-width: 1180px; margin: 0 auto; padding: 28px 24px 64px; display:grid;
+         grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 24px; align-items: start; }
+  .pane { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+  .pane-head { padding: 18px 22px 0; }
+  h1, h2, h3 { margin: 0; letter-spacing: -0.01em; }
+  .pane-head h2 { font-size: 17px; font-weight: 650; }
+  .pane-head p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+  .input { position: sticky; top: 78px; }
+
+  label.field { display:block; font-size: 13.5px; font-weight: 600; margin-bottom: 6px; }
+  input[type=password] { width:100%; padding: 9px 11px; border:1px solid var(--line); border-radius: 8px;
+                         background: var(--bg); }
+
+  /* Tabs */
+  .tabs { display:flex; gap: 4px; margin: 16px 22px 0; padding: 4px; background: var(--raised);
+          border-radius: 10px; width: fit-content; }
+  .tab { border: 0; background: transparent; padding: 6px 14px; border-radius: 7px; cursor: pointer;
+         color: var(--muted); font-size: 14px; font-weight: 550; }
+  .tab[aria-selected=true] { background: var(--surface); color: var(--fg); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+  .tabpanel { padding: 14px 22px 0; }
+  textarea { width:100%; min-height: 300px; resize: vertical; padding: 12px 14px; border:1px solid var(--line);
+             border-radius: 10px; background: var(--bg); font: 13.5px/1.6 var(--mono); }
+  textarea::placeholder { color: var(--muted); font-family: var(--font); font-size: 14px; }
+
+  .drop { display:flex; flex-direction: column; align-items:center; justify-content:center; gap: 6px;
+          min-height: 300px; border: 1.5px dashed var(--line); border-radius: 10px; background: var(--bg);
+          text-align: center; padding: 24px; cursor: pointer; transition: border-color .15s, background .15s; }
+  .drop:hover, .drop.over { border-color: var(--accent); background: var(--soft); }
+  .drop svg { width: 34px; height: 34px; color: var(--accent); margin-bottom: 4px; }
+  .drop strong { font-weight: 600; }
+  .drop span { color: var(--muted); font-size: 13.5px; }
+  .file { display:flex; align-items:center; gap: 12px; padding: 14px; border:1px solid var(--line);
+          border-radius: 10px; background: var(--bg); }
+  .file svg { width: 22px; height: 22px; color: var(--accent); flex: none; }
+  .file div { flex: 1; min-width: 0; }
+  .file b { display:block; font-weight: 600; overflow:hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file span { color: var(--muted); font-size: 13px; }
+
+  .actions { display:flex; flex-wrap: wrap; align-items:center; gap: 10px; padding: 18px 22px 20px; }
+  .btn { padding: 10px 18px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface);
+         cursor: pointer; font-weight: 550; }
+  .btn:hover { border-color: var(--muted); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .btn.primary:hover { filter: brightness(1.08); }
+  .btn:disabled { opacity: .6; cursor: progress; }
+  .btn.small { padding: 5px 10px; font-size: 13px; font-weight: 500; }
+  .toggle { display:flex; align-items:center; gap: 8px; margin-left: auto; font-size: 14px; color: var(--muted);
+            cursor: pointer; user-select: none; }
+  .toggle input { appearance: none; width: 34px; height: 20px; border-radius: 999px; background: var(--line);
+                  position: relative; cursor: pointer; margin: 0; transition: background .15s; }
+  .toggle input::after { content:""; position:absolute; top:3px; left:3px; width:14px; height:14px; border-radius:50%;
+                         background: var(--surface); transition: transform .15s; }
+  .toggle input:checked { background: var(--accent); }
+  .toggle input:checked::after { transform: translateX(14px); }
+
+  /* Output */
+  .output { min-height: 520px; }
+  .empty, .working { padding: 22px; }
+  .steps { list-style: none; margin: 18px 0 0; padding: 0; display:grid; gap: 2px; }
+  .steps li { display:flex; align-items:center; gap: 12px; padding: 10px 12px; border-radius: 8px; color: var(--muted); }
+  .steps li .ic { width: 24px; height: 24px; border-radius: 50%; display:grid; place-items:center; flex:none;
+                  border: 1.5px solid var(--line); font-size: 12px; font-weight: 600; }
+  .steps li.skip { opacity: .45; }
+  .steps li em { font-style: normal; font-size: 13px; margin-left: auto; padding-left: 12px; }
+  .working .steps li:not(.skip) { color: var(--fg); }
+  .working .steps li:not(.skip) .ic { border-color: var(--accent); color: var(--accent); }
+  .progress { height: 3px; border-radius: 3px; background: var(--raised); overflow: hidden; margin-top: 18px; }
+  .progress i { display:block; height:100%; width: 35%; background: var(--accent); border-radius: 3px;
+                animation: slide 1.3s ease-in-out infinite; }
+  @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(300%); } }
+  .elapsed { color: var(--muted); font-size: 13.5px; margin-top: 10px; font-variant-numeric: tabular-nums; }
+  .err { margin: 22px; padding: 14px 16px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--err) 45%, transparent);
+         background: color-mix(in srgb, var(--err) 8%, transparent); color: var(--fg); }
+  .err b { color: var(--err); }
+
+  .result header { padding: 22px 22px 0; }
+  .result h2 { font-size: 22px; font-weight: 680; line-height: 1.25; }
+  .result header p { margin: 8px 0 0; color: var(--muted); max-width: 64ch; }
+  .counts { margin-top: 10px; font-size: 13.5px; color: var(--muted); }
+
+  /* The player: the one bold element */
+  .player { margin: 18px 22px 0; padding: 16px; border-radius: 12px; background: var(--soft);
+            border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); display:flex; align-items:center; gap: 16px; }
+  .play { width: 52px; height: 52px; border-radius: 50%; border: 0; background: var(--accent); color: var(--on-accent);
+          display:grid; place-items:center; cursor:pointer; flex: none; }
+  .play svg { width: 20px; height: 20px; }
+  .wave { flex: 1; min-width: 0; }
+  .wave canvas { display:block; width: 100%; height: 44px; cursor: pointer; }
+  .wave-meta { display:flex; justify-content: space-between; font-size: 12.5px; color: var(--muted);
+               margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .wave-meta a { color: var(--muted); }
+
+  .block { padding: 20px 22px 0; }
+  .block h3 { font-size: 14px; font-weight: 650; margin-bottom: 8px; }
+  .none { color: var(--muted); font-size: 14px; margin: 0; }
+  .items { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .items li { display:flex; align-items:flex-start; gap: 12px; padding: 12px 14px; }
+  .items li + li { border-top: 1px solid var(--line); }
+  .items .task { flex: 1; min-width: 0; }
+  .items .due { display:block; color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .owner { display:inline-flex; align-items:center; gap: 7px; padding: 3px 10px 3px 3px; border-radius: 999px;
+           background: var(--raised); font-size: 13px; font-weight: 550; white-space: nowrap; flex: none; }
+  .owner i { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: var(--on-accent);
+             display:grid; place-items:center; font-style: normal; font-size: 11px; font-weight: 700; }
+  .owner.unassigned { background: transparent; border: 1px dashed var(--line); color: var(--muted); padding: 3px 10px; }
+  .plain { margin: 0; padding-left: 20px; }
+  .plain li { margin: 4px 0; }
+
+  details { margin: 0 22px; border-top: 1px solid var(--line); }
+  details:first-of-type { margin-top: 22px; }
+  details:last-of-type { margin-bottom: 8px; }
+  summary { cursor: pointer; padding: 12px 0; color: var(--muted); font-size: 14px; }
+  summary:hover { color: var(--fg); }
+  details pre { margin: 0 0 14px; padding: 12px; border-radius: 8px; background: var(--bg); border: 1px solid var(--line);
+                white-space: pre-wrap; font: 12.5px/1.55 var(--mono); max-height: 320px; overflow: auto; }
+  details .row { display:flex; justify-content: flex-end; margin-bottom: 8px; }
+
+  @media (max-width: 900px) {
+    main { grid-template-columns: 1fr; padding: 16px 16px 48px; gap: 16px; }
+    .input { position: static; }
+    .bar-inner, .keys-inner { padding-left: 16px; padding-right: 16px; }
+    .keys-inner { grid-template-columns: 1fr; }
+    .brand small { display: none; }
+    .output { min-height: 0; }
+    textarea, .drop { min-height: 220px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .progress i { animation: none; width: 100%; opacity: .5; }
+    * { transition: none !important; }
+  }
 </style>
 </head>
 <body>
-<main>
-  <h1>meeting-briefer</h1>
-  <p class="lead">Paste meeting notes. Claude pulls out decisions and action items, and ElevenLabs reads a short briefing aloud.</p>
-
-  <form id="form">
-    <label for="ak">Anthropic API key <span class="hint">(sent with this request only, never stored)</span></label>
-    <input id="ak" type="password" autocomplete="off" placeholder="sk-ant-...">
-    <label for="ek">ElevenLabs API key <span class="hint">(only needed for audio)</span></label>
-    <input id="ek" type="password" autocomplete="off">
-    <label for="tx">Transcript or notes</label>
-    <textarea id="tx"></textarea>
-    <label for="rec">Or upload a recording <span class="hint">(mp3, wav, m4a, webm; transcribed with ElevenLabs Scribe, needs the ElevenLabs key)</span></label>
-    <input id="rec" type="file" accept="audio/*,video/*">
-    <div class="row">
-      <button class="primary" id="go" type="submit">Make briefing</button>
-      <button type="button" id="example">Load example</button>
-      <label style="margin:0;font-weight:400"><input type="checkbox" id="audio" checked> Generate audio</label>
+<header class="bar">
+  <div class="bar-inner">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="var(--accent)"/><path d="M9 13v6M14 9v14M19 12v8M24 15v2" stroke="var(--on-accent)" stroke-width="2.5" stroke-linecap="round"/></svg>
+      <span>Meeting Briefer <small>notes in, spoken briefing out</small></span>
     </div>
-    <p class="hint" style="margin-top:12px">Leave the key fields empty if the server has its own keys in .env.</p>
-  </form>
+    <div class="spacer"></div>
+    <button class="keys-toggle" id="keysToggle" aria-expanded="false" aria-controls="keys">
+      <span class="dot" id="keysDot"></span><span id="keysLabel">API keys</span>
+    </button>
+  </div>
+</header>
 
-  <div id="error" class="error" hidden></div>
-  <div id="result" class="card" hidden></div>
+<section class="keys" id="keys" hidden>
+  <div class="keys-inner">
+    <div>
+      <label class="field" for="ak">Anthropic API key</label>
+      <input id="ak" type="password" autocomplete="off" placeholder="sk-ant-...">
+    </div>
+    <div>
+      <label class="field" for="ek">ElevenLabs API key</label>
+      <input id="ek" type="password" autocomplete="off" placeholder="Needed for audio and recordings">
+    </div>
+    <button class="btn" id="keysDone" type="button">Done</button>
+    <p id="keysNote">Your keys are sent with each request and used only for it. They are never stored or logged.</p>
+  </div>
+</section>
+
+<main>
+  <section class="pane input" aria-labelledby="inTitle">
+    <div class="pane-head">
+      <h2 id="inTitle">Your meeting</h2>
+      <p>Paste the notes or a transcript, or upload a recording.</p>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Input type">
+      <button class="tab" role="tab" id="tabText" aria-selected="true" aria-controls="panelText">Paste notes</button>
+      <button class="tab" role="tab" id="tabAudio" aria-selected="false" aria-controls="panelAudio" tabindex="-1">Upload recording</button>
+    </div>
+    <form id="form">
+      <div class="tabpanel" role="tabpanel" id="panelText" aria-labelledby="tabText">
+        <textarea id="tx" aria-label="Meeting notes or transcript" placeholder="Hanna: Omar, can you own the rollout?&#10;Omar: Yes, I'll have it live by the 15th."></textarea>
+      </div>
+      <div class="tabpanel" role="tabpanel" id="panelAudio" aria-labelledby="tabAudio" hidden>
+        <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose a recording">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 15V4m0 0L8 8m4-4 4 4M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/></svg>
+          <strong>Drop a recording here, or click to choose</strong>
+          <span id="dropHint">mp3, wav, m4a or webm, up to 25 MB. Transcribed with ElevenLabs Scribe.</span>
+        </div>
+        <div class="file" id="fileCard" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M9 18V6l10-2v12M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm10-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+          <div><b id="fileName"></b><span id="fileSize"></span></div>
+          <button class="btn small" type="button" id="fileClear">Remove</button>
+        </div>
+        <input id="rec" type="file" accept="audio/*,video/*" hidden>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="go" type="submit">Make briefing</button>
+        <button class="btn" type="button" id="example">Load example</button>
+        <label class="toggle"><input type="checkbox" id="audio" checked> Generate audio</label>
+      </div>
+    </form>
+  </section>
+
+  <section class="pane output" aria-live="polite" aria-labelledby="outTitle">
+    <div id="empty" class="empty">
+      <h2 id="outTitle" style="font-size:17px;font-weight:650">Briefing</h2>
+      <p style="margin:4px 0 0;color:var(--muted);font-size:14px">The decisions, action items and a spoken summary will appear here.</p>
+      <ol class="steps" id="stepsEmpty"></ol>
+    </div>
+    <div id="working" class="working" hidden>
+      <h2 style="font-size:17px;font-weight:650">Making your briefing</h2>
+      <ol class="steps" id="stepsWorking"></ol>
+      <div class="progress" aria-hidden="true"><i></i></div>
+      <div class="elapsed" id="elapsed">0 s</div>
+    </div>
+    <div id="error" hidden></div>
+    <div id="result" class="result" hidden></div>
+  </section>
 </main>
 
 <script>
@@ -74,65 +276,239 @@ Leo: Open question: do we keep paying for the old transcription tool? Finance ha
 Hanna: Let's leave that for next week.`;
 
 const $ = (id) => document.getElementById(id);
-const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const list = (items) => items.length ? "<ul>" + items.map((i) => `<li>${esc(i)}</li>`).join("") + "</ul>" : '<p class="none">None</p>';
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let mode = "text", file = null, serverKeys = { anthropic: false, elevenlabs: false }, maxMb = 25, timer = null;
 
-$("example").onclick = () => { $("tx").value = EXAMPLE; $("rec").value = ""; };
+/* ---------- Pipeline steps (shown before and during a run) ---------- */
+function steps() {
+  const audio = $("audio").checked, rec = mode === "audio";
+  return [
+    { label: "Transcribe the recording with ElevenLabs Scribe", on: rec, off: "Recordings only" },
+    { label: "Find decisions, action items and owners with Claude", on: true },
+    { label: "Check every owner against the transcript", on: true },
+    { label: "Read the briefing aloud with ElevenLabs", on: audio, off: "Audio is off" },
+  ];
+}
+function renderSteps() {
+  const html = steps().map((s, i) =>
+    `<li class="${s.on ? "" : "skip"}"><span class="ic">${i + 1}</span>${esc(s.label)}${s.on ? "" : `<em>${esc(s.off)}</em>`}</li>`).join("");
+  $("stepsEmpty").innerHTML = html; $("stepsWorking").innerHTML = html;
+}
+
+/* ---------- Keys ---------- */
+function updateKeys() {
+  const mine = $("ak").value.trim() || $("ek").value.trim();
+  const ready = $("ak").value.trim() || serverKeys.anthropic;
+  $("keysDot").className = "dot " + (ready ? "ready" : "needed");
+  $("keysLabel").textContent = mine ? "Using your keys" : serverKeys.anthropic ? "Using server keys" : "Add API keys";
+}
+function showKeys(open) {
+  $("keys").hidden = !open; $("keysToggle").setAttribute("aria-expanded", open);
+  if (open) $("ak").focus();
+}
+$("keysToggle").onclick = () => showKeys($("keys").hidden);
+$("keysDone").onclick = () => { showKeys(false); $("keysToggle").focus(); };
+$("ak").oninput = $("ek").oninput = updateKeys;
+
+fetch("/status").then((r) => r.json()).then((s) => {
+  serverKeys = s.server_keys; maxMb = s.max_upload_mb || 25;
+  $("dropHint").textContent = `mp3, wav, m4a or webm, up to ${maxMb} MB. Transcribed with ElevenLabs Scribe.`;
+  if (!serverKeys.anthropic) {
+    $("keysNote").textContent = "This server has no keys of its own, so add yours. They are sent with each request and used only for it, never stored or logged.";
+    showKeys(true);
+  }
+  updateKeys();
+}).catch(updateKeys);
+
+/* ---------- Tabs ---------- */
+function setMode(m) {
+  mode = m;
+  for (const [tab, panel, name] of [["tabText", "panelText", "text"], ["tabAudio", "panelAudio", "audio"]]) {
+    const on = name === m;
+    $(tab).setAttribute("aria-selected", on); $(tab).tabIndex = on ? 0 : -1; $(panel).hidden = !on;
+  }
+  renderSteps();
+}
+$("tabText").onclick = () => setMode("text");
+$("tabAudio").onclick = () => setMode("audio");
+document.querySelector(".tabs").addEventListener("keydown", (e) => {
+  if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+  const next = mode === "text" ? "audio" : "text";
+  setMode(next); $(next === "text" ? "tabText" : "tabAudio").focus();
+});
+$("audio").onchange = renderSteps;
+
+/* ---------- Recording upload ---------- */
+const size = (b) => b > 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(b / 1024)) + " KB";
+function setFile(f) {
+  if (f && !/^(audio|video)\//.test(f.type) && !/\.(mp3|wav|m4a|ogg|webm|flac|mp4)$/i.test(f.name)) {
+    return showError("That file isn't a recording. Choose an mp3, wav, m4a or webm file.");
+  }
+  if (f && f.size > maxMb * 1048576) return showError(`That recording is ${size(f.size)}. The limit is ${maxMb} MB.`);
+  file = f || null;
+  $("drop").hidden = !!file; $("fileCard").hidden = !file;
+  if (file) { $("fileName").textContent = file.name; $("fileSize").textContent = size(file.size); }
+  $("rec").value = "";
+}
+$("drop").onclick = () => $("rec").click();
+$("drop").onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("rec").click(); } };
+$("rec").onchange = () => setFile($("rec").files[0]);
+$("fileClear").onclick = () => { setFile(null); $("drop").focus(); };
+["dragenter", "dragover"].forEach((t) => $("drop").addEventListener(t, (e) => { e.preventDefault(); $("drop").classList.add("over"); }));
+["dragleave", "drop"].forEach((t) => $("drop").addEventListener(t, (e) => { e.preventDefault(); $("drop").classList.remove("over"); }));
+$("drop").addEventListener("drop", (e) => setFile(e.dataTransfer.files[0]));
+
+$("example").onclick = () => { setMode("text"); $("tx").value = EXAMPLE; $("tx").focus(); };
+
+/* ---------- Output states ---------- */
+function show(state) {
+  for (const id of ["empty", "working", "error", "result"]) $(id).hidden = id !== state;
+}
+function showError(msg) {
+  $("error").innerHTML = `<div class="err"><b>Couldn't make the briefing.</b> ${esc(msg)}</div>`;
+  show("error");
+}
 
 $("form").onsubmit = async (e) => {
   e.preventDefault();
-  $("error").hidden = true; $("result").hidden = true;
-  $("go").disabled = true; $("go").textContent = "Working...";
   const headers = {};
   if ($("ak").value.trim()) headers["X-Anthropic-Api-Key"] = $("ak").value.trim();
   if ($("ek").value.trim()) headers["X-ElevenLabs-Api-Key"] = $("ek").value.trim();
-  const file = $("rec").files[0];
+
+  let url, body;
+  if (mode === "audio") {
+    if (!file) return showError("Choose a recording first, or switch to Paste notes.");
+    url = "/briefings/audio?" + new URLSearchParams({ audio: $("audio").checked, filename: file.name });
+    headers["Content-Type"] = file.type || "audio/mpeg";  // raw audio body, not a form
+    body = file;
+  } else {
+    if ($("tx").value.trim().length < 20) return showError("Paste the meeting notes first, or press Load example.");
+    url = "/briefings";
+    headers["Content-Type"] = "application/json";
+    body = JSON.stringify({ transcript: $("tx").value, audio: $("audio").checked, source: "web" });
+  }
+
+  renderSteps(); show("working");
+  $("go").disabled = true; $("go").textContent = "Making briefing...";
+  const started = Date.now();
+  $("elapsed").textContent = "0 s";
+  timer = setInterval(() => { $("elapsed").textContent = Math.round((Date.now() - started) / 1000) + " s"; }, 500);
   try {
-    let resp;
-    if (file) {
-      // The recording goes up as the raw body with its audio/* type, not as a form.
-      $("go").textContent = "Transcribing...";
-      const query = new URLSearchParams({ audio: $("audio").checked, filename: file.name });
-      resp = await fetch("/briefings/audio?" + query, {
-        method: "POST",
-        headers: { ...headers, "Content-Type": file.type || "audio/mpeg" },
-        body: file,
-      });
-    } else {
-      if ($("tx").value.trim().length < 20) throw new Error("Paste a transcript or choose a recording.");
-      resp = await fetch("/briefings", {
-        method: "POST",
-        headers: { ...headers, "Content-Type": "application/json" },
-        body: JSON.stringify({ transcript: $("tx").value, audio: $("audio").checked, source: "web" }),
-      });
+    const resp = await fetch(url, { method: "POST", headers, body });
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok) {
+      const d = data.detail;
+      throw new Error(typeof d === "string" ? d : Array.isArray(d) ? d.map((x) => x.msg).join(" ") : `The server answered ${resp.status}.`);
     }
-    const data = await resp.json();
-    if (!resp.ok) throw new Error(typeof data.detail === "string" ? data.detail : JSON.stringify(data.detail));
-    render(data);
+    render(data, Math.round((Date.now() - started) / 1000));
   } catch (err) {
-    $("error").textContent = "Error: " + err.message; $("error").hidden = false;
+    showError(err.message === "Failed to fetch" ? "The server isn't reachable. Is it still running?" : err.message);
   } finally {
+    clearInterval(timer);
     $("go").disabled = false; $("go").textContent = "Make briefing";
   }
 };
 
-function render(d) {
+/* ---------- Result ---------- */
+const initials = (name) => name.replace(/[^\p{L}\p{N} ]/gu, " ").trim().split(/\s+/).map((p) => p[0]).join("").slice(0, 2).toUpperCase() || "?";
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+const list = (items) => items.length ? `<ul class="plain">${items.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>` : `<p class="none">None</p>`;
+
+function render(d, seconds) {
   const s = d.summary;
-  const rows = s.action_items.map((a) =>
-    `<tr><td>${esc(a.task)}</td><td>${a.owner ? esc(a.owner) : '<span class="none">unassigned</span>'}</td><td>${esc(a.due ?? "")}</td></tr>`).join("");
+  const items = s.action_items.map((a) => `
+    <li>
+      <div class="task">${esc(a.task)}${a.due ? `<span class="due">Due ${esc(a.due)}</span>` : ""}</div>
+      ${a.owner ? `<span class="owner"><i>${esc(initials(a.owner))}</i>${esc(a.owner)}</span>`
+                : `<span class="owner unassigned">Unassigned</span>`}
+    </li>`).join("");
+  const json = JSON.stringify(s, null, 2);
   $("result").innerHTML = `
-    <h2 style="margin-top:0">${esc(s.title)}</h2>
-    <p>${esc(s.summary)}</p>
-    ${d.audio_url ? `<audio controls src="${esc(d.audio_url)}"></audio>` : ""}
-    <h2>Decisions</h2>${list(s.decisions)}
-    <h2>Action items</h2>
-    ${rows ? `<table><tr><th>Task</th><th>Owner</th><th>Due</th></tr>${rows}</table>` : '<p class="none">None</p>'}
-    <h2>Open questions</h2>${list(s.open_questions)}
+    <header>
+      <h2>${esc(s.title)}</h2>
+      <p>${esc(s.summary)}</p>
+      <div class="counts">${plural(s.action_items.length, "action item", "action items")}, ${plural(s.decisions.length, "decision", "decisions")}, ${plural(s.open_questions.length, "open question", "open questions")}. Done in ${seconds} s.</div>
+    </header>
+    ${d.audio_url ? `
+    <div class="player">
+      <button class="play" id="play" type="button" aria-label="Play briefing"></button>
+      <div class="wave"><canvas id="wave" aria-label="Briefing waveform, click to jump"></canvas>
+        <div class="wave-meta"><span id="time">0:00</span><a href="${esc(d.audio_url)}" download="briefing.mp3">Download MP3</a></div></div>
+      <audio id="player" src="${esc(d.audio_url)}" preload="auto"></audio>
+    </div>` : ""}
+    <div class="block"><h3>Action items</h3>${items ? `<ul class="items">${items}</ul>` : `<p class="none">No action items.</p>`}</div>
+    <div class="block"><h3>Decisions</h3>${list(s.decisions)}</div>
+    <div class="block"><h3>Open questions</h3>${list(s.open_questions)}</div>
     ${d.transcript ? `<details><summary>Transcript from the recording</summary><pre>${esc(d.transcript)}</pre></details>` : ""}
-    <details><summary>Briefing script and raw JSON (attempts: ${d.attempts})</summary>
-      <p>${esc(d.script)}</p><pre>${esc(JSON.stringify(s, null, 2))}</pre></details>`;
-  $("result").hidden = false;
+    <details><summary>Briefing script</summary><pre>${esc(d.script)}</pre></details>
+    <details><summary>JSON (${d.attempts === 1 ? "first attempt" : d.attempts + " attempts"})</summary>
+      <div class="row"><button class="btn small" type="button" id="copy">Copy JSON</button></div><pre>${esc(json)}</pre></details>`;
+  show("result");
+  $("copy").onclick = async () => {
+    try { await navigator.clipboard.writeText(json); $("copy").textContent = "Copied"; }
+    catch { $("copy").textContent = "Copy failed"; }
+    setTimeout(() => { $("copy").textContent = "Copy JSON"; }, 1500);
+  };
+  if (d.audio_url) setupPlayer();
+  if (window.matchMedia("(max-width: 900px)").matches) $("result").scrollIntoView({ behavior: "smooth" });
 }
+
+/* ---------- Player with a waveform drawn from the real audio ---------- */
+const ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>';
+const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>';
+const clock = (t) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
+
+function setupPlayer() {
+  const audio = $("player"), btn = $("play"), canvas = $("wave");
+  let peaks = new Array(90).fill(0.12);
+  btn.innerHTML = ICON_PLAY;
+
+  const draw = () => {
+    const dpr = window.devicePixelRatio || 1, w = canvas.clientWidth, h = canvas.clientHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    const ctx = canvas.getContext("2d"); ctx.scale(dpr, dpr);
+    const css = getComputedStyle(document.documentElement);
+    const played = audio.duration ? audio.currentTime / audio.duration : 0;
+    const gap = 2, bw = Math.max(1.5, w / peaks.length - gap);
+    peaks.forEach((p, i) => {
+      const x = i * (bw + gap), bh = Math.max(3, p * h);
+      ctx.fillStyle = (i / peaks.length) < played ? css.getPropertyValue("--accent") : css.getPropertyValue("--muted");
+      ctx.globalAlpha = (i / peaks.length) < played ? 1 : 0.45;
+      ctx.beginPath(); ctx.roundRect(x, (h - bh) / 2, bw, bh, bw / 2); ctx.fill();
+    });
+    $("time").textContent = `${clock(audio.currentTime || 0)} / ${clock(audio.duration || 0)}`;
+  };
+
+  fetch(audio.src).then((r) => r.arrayBuffer())
+    .then((buf) => new (window.AudioContext || window.webkitAudioContext)().decodeAudioData(buf))
+    .then((decoded) => {
+      const data = decoded.getChannelData(0), n = 90, block = Math.floor(data.length / n);
+      const raw = Array.from({ length: n }, (_, i) => {
+        let sum = 0;
+        for (let j = 0; j < block; j += 16) sum += Math.abs(data[i * block + j]);
+        return sum / (block / 16);
+      });
+      const max = Math.max(...raw) || 1;
+      peaks = raw.map((v) => 0.08 + 0.92 * (v / max));
+      draw();
+    }).catch(draw);
+
+  let frame;
+  const loop = () => { draw(); frame = requestAnimationFrame(loop); };
+  btn.onclick = () => (audio.paused ? audio.play() : audio.pause());
+  audio.onplay = () => { btn.innerHTML = ICON_PAUSE; btn.setAttribute("aria-label", "Pause briefing"); loop(); };
+  audio.onpause = audio.onended = () => { btn.innerHTML = ICON_PLAY; btn.setAttribute("aria-label", "Play briefing"); cancelAnimationFrame(frame); draw(); };
+  audio.onloadedmetadata = draw;
+  canvas.onclick = (e) => {
+    if (!audio.duration) return;
+    const r = canvas.getBoundingClientRect();
+    audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration; draw();
+  };
+  window.addEventListener("resize", draw);
+  draw();
+}
+
+renderSteps();
 </script>
 </body>
 </html>

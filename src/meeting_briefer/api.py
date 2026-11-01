@@ -148,6 +148,24 @@ def create_app(run=pipeline.run, run_audio=pipeline.run_from_audio) -> FastAPI:
     def health() -> dict:
         return {"status": "ok"}
 
+    @app.get("/status")
+    def status(settings: Settings = Depends(get_settings)) -> dict:
+        """Whether the server has its own keys, so the page knows to ask for the caller's.
+
+        Says only whether a key is set, never anything about the key itself.
+        """
+
+        def present(secret: SecretStr | None) -> bool:
+            return bool(secret and secret.get_secret_value())
+
+        return {
+            "server_keys": {
+                "anthropic": present(settings.anthropic_api_key),
+                "elevenlabs": present(settings.elevenlabs_api_key),
+            },
+            "max_upload_mb": settings.max_upload_mb,
+        }
+
     @app.post("/briefings", response_model=BriefingResponse)
     async def create_briefing(
         request: Request,
