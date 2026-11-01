@@ -4,9 +4,9 @@
 
 Give it a meeting recording or the notes from one. ElevenLabs Scribe turns the recording into a transcript, Claude pulls out the decisions, action items and owners as validated JSON, and ElevenLabs reads a short briefing aloud.
 
-[![Meeting Briefer, 30-second demo: click to watch with sound](docs/demo/poster.jpg)](docs/demo/meeting-briefer-demo.mp4)
+<a href="https://smartulf123.github.io/meeting-briefer/"><img src="docs/demo/poster.jpg" alt="Watch the 30-second demo of Meeting Briefer: notes go in, Claude finds the action items and owners, and ElevenLabs reads the briefing aloud"></a>
 
-**Watch the 30-second demo** ([MP4, with sound](docs/demo/meeting-briefer-demo.mp4)). The briefing voice in it is the app's real ElevenLabs output. The narrator is a local AI voice, and I made the video with Cutscene, my own AI video tool.
+**Click to watch the 30-second demo** (with sound). The briefing voice in it is the app's real ElevenLabs output. The narrator is a local AI voice, and I made the video with Cutscene, my own AI video tool.
 
 **Demo, text in:** [demo/output/briefing.mp3](demo/output/briefing.mp3) (41 seconds), made from [demo/standup.txt](demo/standup.txt). The JSON it produced is in [demo/output/summary.json](demo/output/summary.json).
 

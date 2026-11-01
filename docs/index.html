@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Meeting Briefer · demo</title>
+  <meta name="description" content="A 30-second demo of Meeting Briefer: meeting notes or a recording in, action items with owners and a spoken ElevenLabs briefing out.">
+  <meta property="og:title" content="Meeting Briefer">
+  <meta property="og:description" content="Notes in, spoken briefing out. Claude finds the action items, ElevenLabs reads the briefing.">
+  <meta property="og:image" content="https://smartulf123.github.io/meeting-briefer/demo/poster.jpg">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2393b4ff'/%3E%3Cpath d='M9 13v6M14 9v14M19 12v8M24 15v2' stroke='%23141210' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E">
+  <style>
+    :root { color-scheme: dark; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center;
+           background: radial-gradient(ellipse at 50% 25%, #1f2433, #141210 65%); color: #f5f5f4;
+           font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    main { width: min(1100px, 100% - 32px); padding: 40px 0; text-align: center; }
+    .brand { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+    .brand svg { width: 40px; height: 40px; }
+    h1 { margin: 0; font-size: clamp(28px, 5vw, 44px); letter-spacing: -0.02em; }
+    p { margin: 0 0 24px; color: #a8a29e; }
+    video { width: 100%; border-radius: 14px; background: #000;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .5), 0 0 0 1px rgba(147, 180, 255, .25); }
+    .stack { margin-top: 24px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .stack span { padding: 6px 14px; border-radius: 999px; border: 1px solid #2e2a27; background: #1c1917; font-size: 14px; }
+    a { color: #93b4ff; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#93b4ff"/><path d="M9 13v6M14 9v14M19 12v8M24 15v2" stroke="#141210" stroke-width="2.5" stroke-linecap="round"/></svg>
+      <h1>Meeting Briefer</h1>
+    </div>
+    <p>Notes in, spoken briefing out. Claude finds the action items, ElevenLabs reads the briefing.</p>
+    <video src="demo/meeting-briefer-demo.mp4" poster="demo/poster.jpg" controls playsinline preload="metadata"></video>
+    <div class="stack"><span>Python</span><span>Claude</span><span>ElevenLabs</span></div>
+    <p style="margin-top:16px"><a href="https://github.com/Smartulf123/meeting-briefer">github.com/Smartulf123/meeting-briefer</a></p>
+  </main>
+</body>
+</html>
